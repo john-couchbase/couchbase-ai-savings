@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Data Plane Token Savings Estimator | Couchbase</title>
+<meta name="description" content="Estimate how much LLM token spend the Couchbase AI Data Plane could remove from your agent workloads through caching, agent memory, retrieval, and tool search. Directional estimates with every assumption and source shown.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== Base design system, matched to the Couchbase Database TCO Calculator ===== */
+:root {
+  --cb-red: #e31b23;
+  --cb-red-dark: #a9151b;
+  --ink: #111318;
+  --muted: #5a6472;
+  --line: #e6e2dc;
+  --cream: #fff6e6;
+  --cream-2: #fbefe0;
+  --card: #ffffff;
+  --green: #147a4a;
+  --amber: #9a5b00;
+  --shadow: 0 20px 45px rgba(17, 19, 24, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(227, 27, 35, 0.08), transparent 32rem),
+    linear-gradient(180deg, var(--cream) 0, #fff 26rem);
+}
+
+button, input, select { font: inherit; }
+
+.hero { padding: 2rem clamp(1rem, 4vw, 4rem) 1rem; }
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.logo-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.55rem;
+  background: var(--cb-red);
+  position: relative;
+  flex: none;
+}
+.logo-mark::after {
+  content: "";
+  position: absolute;
+  left: 0.48rem;
+  right: 0.48rem;
+  bottom: 0.62rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: white;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  gap: 2rem;
+  align-items: end;
+  margin-top: 3rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--cb-red-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+
+h1 {
+  max-width: 58rem;
+  margin-bottom: 1rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+h2 { margin-bottom: 0.8rem; font-size: 1.35rem; letter-spacing: -0.03em; }
+h3 { margin-bottom: 0.65rem; }
+
+.subhead { max-width: 48rem; color: var(--muted); font-size: 1.1rem; line-height: 1.55; }
+
+.hero-card, .panel, .summary-box, .state-panel {
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.hero-card { padding: 1.25rem; background: var(--ink); color: white; }
+.hero-card p { color: #d8dce2; margin: 0.45rem 0 0; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(25rem, 0.95fr);
+  gap: 1.5rem;
+  padding: 1rem clamp(1rem, 4vw, 4rem) 3rem;
+}
+
+.panel { padding: clamp(1rem, 2.2vw, 1.6rem); }
+
+.wide-section { padding: 0 clamp(1rem, 4vw, 4rem) 3rem; max-width: 90rem; }
+
+.results-panel { position: sticky; top: 1rem; align-self: start; }
+
+.section-heading.spaced { margin-top: 2rem; }
+
+.tool-groups { display: grid; gap: 1rem; }
+
+.tool-group {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #fff;
+}
+.tool-group h3 { margin-bottom: 0.75rem; font-size: 1rem; }
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.55rem;
+}
+
+.check-card {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  background: #fffdf9;
+}
+.check-card:has(input:checked) { border-color: rgba(227, 27, 35, 0.55); background: #fff2f2; }
+.check-card input { margin-top: 0.2rem; accent-color: var(--cb-red); }
+.check-card span { font-weight: 750; }
+.check-card small { display: block; color: var(--muted); margin-top: 0.15rem; line-height: 1.35; }
+
+.input-stack { display: grid; gap: 0.9rem; }
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr 9rem;
+  gap: 0.8rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 0.85rem;
+  background: #fff;
+}
+.field label { display: block; font-weight: 750; }
+.field p { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+.field-controls { display: grid; gap: 0.35rem; }
+
+input[type="range"] { width: 100%; accent-color: var(--cb-red); }
+input[type="number"], select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  background: #fff;
+}
+
+.advanced {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 0.95rem;
+  background: #fffdf9;
+}
+.advanced summary, .state-panel summary { cursor: pointer; font-weight: 850; }
+.advanced .input-stack { margin-top: 0.9rem; }
+
+.result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+
+.result-card { min-height: 7.5rem; border: 1px solid var(--line); border-radius: 1rem; padding: 1rem; background: #fff; }
+.result-card.primary {
+  grid-column: 1 / -1;
+  color: white;
+  background: linear-gradient(135deg, var(--cb-red), var(--cb-red-dark));
+  border: 0;
+}
+.result-card span { display: block; color: var(--muted); font-size: 0.85rem; font-weight: 750; }
+.result-card.primary span { color: rgba(255,255,255,0.78); }
+.result-card strong { display: block; margin-top: 0.75rem; font-size: clamp(1.35rem, 2.6vw, 2rem); letter-spacing: -0.04em; }
+
+.message { margin: 1rem 0; border-radius: 0.9rem; padding: 0.85rem 1rem; background: #ecfdf3; color: var(--green); font-weight: 700; }
+.message.warning { background: #fff7e5; color: var(--amber); }
+
+.summary-box, .state-panel { margin-top: 1rem; padding: 1rem; box-shadow: none; }
+.summary-box p { margin-bottom: 0; color: var(--muted); line-height: 1.5; }
+
+.benchmark-list { margin: 0; padding-left: 1.15rem; color: var(--muted); line-height: 1.45; }
+.benchmark-list li + li { margin-top: 0.45rem; }
+
+.button-row { display: flex; gap: 0.8rem; align-items: center; margin: 0.9rem 0; flex-wrap: wrap; }
+
+button { border: 0; border-radius: 0.75rem; padding: 0.72rem 0.95rem; color: white; background: var(--ink); cursor: pointer; font-weight: 800; }
+button:hover { background: var(--cb-red-dark); }
+
+pre {
+  max-height: 24rem; overflow: auto; margin: 0;
+  border: 1px solid var(--line); border-radius: 0.8rem; padding: 1rem;
+  background: #101116; color: #f4f6f8; font-size: 0.78rem; line-height: 1.45;
+}
+
+footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
+
+@media (max-width: 960px) {
+  .hero-grid, .layout { grid-template-columns: 1fr; }
+  .results-panel { position: static; }
+  footer { padding-inline: 1rem; }
+}
+@media (max-width: 640px) {
+  .field, .result-grid { grid-template-columns: 1fr; }
+  .hero { padding-top: 1.25rem; }
+  h1 { font-size: 2.4rem; }
+}
+
+.source-line { display: block; margin-top: 0.25rem; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+.source-line a { color: var(--muted); }
+
+/* ===== Small additions, namespaced to avoid clashing with the base system ===== */
+.tk-ghost-btn {
+  background: #fff; color: var(--ink); border: 1px solid var(--line);
+  padding: 0.5rem 0.85rem; border-radius: 0.65rem; font-weight: 700; font-size: 0.82rem;
+}
+.tk-ghost-btn:hover { background: var(--cream-2); color: var(--ink); }
+.tk-invert-btn { background: #fff; color: var(--ink); }
+.tk-invert-btn:hover { background: var(--cream-2); }
+.tk-badge {
+  display: inline-block; font-size: 0.72rem; font-weight: 750; color: var(--muted);
+  background: var(--cream-2); border-radius: 999px; padding: 0.15rem 0.6rem; margin-left: 0.4rem;
+  text-transform: none; letter-spacing: 0;
+}
+.tk-hidden { display: none !important; }
+.tk-chip { display: inline-block; background: #fffdf9; border: 1px solid var(--line); border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.82rem; margin: 0.2rem 0.3rem 0 0; }
+.tk-chip.empty { color: var(--muted); border-style: dashed; }
+.tk-breakdown-table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; font-size: 0.82rem; }
+.tk-breakdown-table td { padding: 0.35rem 0; border-bottom: 1px solid var(--line); color: var(--ink); }
+.tk-breakdown-table td:last-child { text-align: right; }
+.tk-breakdown-note { color: var(--muted); font-size: 0.78rem; padding-top: 0.5rem; display: block; }
+
+.tk-lever-controls { margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px dashed var(--line); display: grid; gap: 0.6rem; }
+.tk-lever-controls .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.6rem; }
+.tk-lever-controls .row label { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+.tk-lever-controls .row output { font-size: 0.82rem; font-weight: 800; color: var(--cb-red-dark); min-width: 3rem; text-align: right; }
+.tk-lever-controls .archetype-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 0.4rem; }
+.tk-lever-controls .archetype-grid label {
+  border: 1px solid var(--line); border-radius: 0.6rem; padding: 0.45rem 0.55rem; cursor: pointer;
+  font-size: 0.76rem; font-weight: 700; background: #fff; display: block;
+}
+.tk-lever-controls .archetype-grid label:has(input:checked) { border-color: rgba(227,27,35,0.55); background: #fff2f2; }
+.tk-lever-controls .archetype-grid input { accent-color: var(--cb-red); margin-right: 0.3rem; }
+.tk-lever-savings { margin-top: 0.7rem; font-size: 0.85rem; font-weight: 800; color: var(--green); }
+
+.tk-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: var(--cream-2);
+  color: var(--cb-red-dark);
+  font-size: 0.68rem;
+  font-weight: 900;
+  cursor: help;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+.tk-tip-bubble {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  bottom: 135%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16rem;
+  background: var(--ink);
+  color: #f2f4f6;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.65rem;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  font-weight: 500;
+  text-align: left;
+  cursor: auto;
+  box-shadow: var(--shadow);
+  white-space: normal;
+}
+.check-card .tk-tip-bubble { font-weight: 500; }
+.tk-tip-bubble a { color: #fff; font-weight: 700; }
+.tk-tip:hover .tk-tip-bubble, .tk-tip:focus .tk-tip-bubble, .tk-tip.tk-tip-show .tk-tip-bubble { display: block; }
+.tk-tip-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--ink);
+}
+@media (max-width: 640px) {
+  .tk-tip-bubble { left: auto; right: -0.5rem; transform: none; }
+  .tk-tip-bubble::after { left: auto; right: 0.7rem; transform: none; }
+}
+
+/* ===== Step 1 payment mode ===== */
+.tk-mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+@media (max-width: 640px) { .tk-mode-grid { grid-template-columns: 1fr; } }
+.tk-subhead { font-size: 0.95rem; margin: 1.2rem 0 0.6rem; }
+#gpuInputs .input-stack + .button-row { margin-top: 0.6rem; }
+#gpuInputs .button-row + .input-stack { margin-top: 0; }
+
+/* ===== Assumptions panel ===== */
+.tk-rate-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.tk-rate-table th { text-align: left; color: var(--muted); font-weight: 750; font-size: 0.76rem; padding: 0 0.4rem 0.4rem 0; }
+.tk-rate-table td { padding: 0.45rem 0.4rem 0.45rem 0; border-top: 1px solid var(--line); vertical-align: middle; }
+.tk-rate-table td:first-child { font-weight: 700; }
+.tk-rate-table input[type="number"] { width: 4.6rem; padding: 0.35rem 0.45rem; }
+.tk-rate-table .src { display: block; color: var(--muted); font-weight: 500; font-size: 0.74rem; margin-top: 0.15rem; }
+.tk-custom-flag { color: var(--amber); font-weight: 800; font-size: 0.74rem; }
+
+/* ===== CTA ===== */
+.tk-cta-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.85rem; }
+.tk-cta-links a { color: #fff; font-weight: 700; }
+.tk-sources { margin: 0.4rem 0 0; padding-left: 1.15rem; color: var(--muted); line-height: 1.5; font-size: 0.85rem; }
+.tk-sources li + li { margin-top: 0.35rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ===== FAQ module ===== */
+.faq-section { margin-top: 2rem; }
+.faq-section h2 { font-size: 1.15rem; }
+.faq-section .subhead { font-size: 0.9rem; margin-bottom: 1rem; }
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.75rem; align-items: start; }
+.faq-item {
+  background: var(--ink);
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  color: #fff;
+}
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 750;
+  font-size: 0.92rem;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "+";
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.faq-item[open] summary::after { content: "\2013"; }
+.faq-item[open] summary { margin-bottom: 0.6rem; }
+.faq-item p { margin: 0; color: #d8dce2; font-size: 0.85rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="brand-row">
+      <div class="logo-mark" aria-hidden="true"></div>
+      Couchbase<sup style="font-size:0.6em;">&reg;</sup> <span style="color:var(--muted); font-weight:600;">&middot; AI Data Plane Token Savings Estimator</span>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">AI Data Plane&trade; token and inference savings estimate</p>
+        <h1>Stop paying for tokens and GPU hours your agents don't need.</h1>
+        <p class="subhead">Agents spend tokens on repeat questions, resent conversation history, whole documents where a passage would do, and tool lists the model never uses. The Couchbase AI Data Plane&trade; handles each of these where your data already lives, so your token bill doesn't have to grow in step with the work your agents do. Running models on your own GPUs? Compare that fleet with serverless models billed by the token, then see what the levers save on top. Every assumption and source is on the page.</p>
+      </div>
+      <div class="hero-card">
+        <strong style="font-size:1.05rem;">Important disclaimer</strong>
+        <p>Directional estimates to guide your evaluation, not a formal quote. See the methodology notes below.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <main>
+      <p class="eyebrow">Step 1</p>
+      <h2>How do you pay for inference today?</h2>
+      <div class="tk-mode-grid" role="radiogroup" aria-label="How you pay for inference today">
+        <label class="check-card">
+          <input type="radio" name="mode" value="token" checked>
+          <span style="display:block;">
+            <span>Per token</span>
+            <small>You pay a model provider or API for the tokens you use.</small>
+          </span>
+        </label>
+        <label class="check-card">
+          <input type="radio" name="mode" value="gpu">
+          <span style="display:block;">
+            <span>Dedicated GPUs</span>
+            <small>You run models on GPU instances billed by the hour, self-hosted or provisioned.</small>
+          </span>
+        </label>
+      </div>
+
+      <div id="tokenInputs">
+        <div class="field">
+          <div>
+            <label for="monthlySpend">Monthly token spend (USD)</label>
+            <p>What you pay model providers each month, across all models and teams.</p>
+          </div>
+          <div class="field-controls">
+            <input type="number" id="monthlySpend" min="0" step="500" value="20000" placeholder="0">
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="button" class="tk-ghost-btn" data-spend="5000">$5K/mo &middot; small team</button>
+          <button type="button" class="tk-ghost-btn" data-spend="20000">$20K/mo &middot; mid-market</button>
+          <button type="button" class="tk-ghost-btn" data-spend="75000">$75K/mo &middot; large scale</button>
+          <button type="button" class="tk-ghost-btn" data-spend="250000">$250K/mo &middot; hyperscale</button>
+        </div>
+      </div>
+
+      <div id="gpuInputs" class="tk-hidden">
+        <h3 class="tk-subhead">Your GPU fleet</h3>
+        <div class="input-stack">
+          <div class="field">
+            <div>
+              <label for="gpuInstances">GPU instances</label>
+              <p>How many instances you keep running to cover your peak. The default of two is a minimal production setup with a spare for failover.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="gpuInstances" min="0" step="1"></div>
+          </div>
+          <div class="field">
+            <div>
+              <label for="gpuPricing">How you pay for the instances</label>
+              <p id="gpuPriceNote"></p>
+            </div>
+            <div class="field-controls"><select id="gpuPricing"></select></div>
+          </div>
+          <div class="field">
+            <div>
+              <label for="gpuHourly">Hourly rate per instance (USD)</label>
+              <p>Enter your own effective rate if it's different.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="gpuHourly" min="0" step="0.01"></div>
+          </div>
+          <div class="field">
+            <div>
+              <label for="gpuHours">Hours a month the fleet runs</label>
+              <p>730 means always on. Lower it if you scale the fleet down off-peak.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="gpuHours" min="0" max="744" step="1"></div>
+          </div>
+        </div>
+
+        <h3 class="tk-subhead">Your traffic</h3>
+        <div class="input-stack">
+          <div class="field">
+            <div>
+              <label for="reqMonth">Model requests a month</label>
+              <p>Every call your agents and apps make to the model.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="reqMonth" min="0" step="10000"></div>
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="button" class="tk-ghost-btn" data-req="100000">100K/mo</button>
+          <button type="button" class="tk-ghost-btn" data-req="1000000">1M/mo</button>
+          <button type="button" class="tk-ghost-btn" data-req="10000000">10M/mo</button>
+          <button type="button" class="tk-ghost-btn" data-req="50000000">50M/mo</button>
+        </div>
+        <div class="input-stack">
+          <div class="field">
+            <div>
+              <label for="inTok">Input tokens per request</label>
+              <p>Average prompt size: instructions, context, history, and tool definitions.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="inTok" min="0" step="100"></div>
+          </div>
+          <div class="field">
+            <div>
+              <label for="outTok">Output tokens per request</label>
+              <p>Average response length.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="outTok" min="0" step="50"></div>
+          </div>
+        </div>
+
+        <h3 class="tk-subhead">Serverless model price</h3>
+        <div class="input-stack">
+          <div class="field">
+            <div>
+              <label for="modelPreset">Model</label>
+              <p id="priceNote"></p>
+            </div>
+            <div class="field-controls"><select id="modelPreset"></select></div>
+          </div>
+          <div class="field">
+            <div><label for="priceIn">Price per 1M input tokens (USD)</label></div>
+            <div class="field-controls"><input type="number" id="priceIn" min="0" step="0.01"></div>
+          </div>
+          <div class="field">
+            <div><label for="priceOut">Price per 1M output tokens (USD)</label></div>
+            <div class="field-controls"><input type="number" id="priceOut" min="0" step="0.01"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="eyebrow section-heading spaced">Step 2</p>
+      <h2>Which levers fit your workload?</h2>
+      <p class="subhead" style="font-size:0.95rem; margin-bottom:1rem;">Each lever applies only to the slice of token spend you assign it, never your whole bill. Turn on the ones that match how your agents work today.</p>
+      <p class="message tk-hidden" id="gpuLeverNote" style="margin-top:-0.3rem; font-size:0.86rem; font-weight:600;">These levers apply to the serverless bill from Step 1. On serverless you pay per token, so fewer tokens means a smaller bill. On a fixed GPU fleet, fewer tokens frees up capacity but doesn't change the invoice unless you shrink the fleet.</p>
+      <div class="tool-groups" id="leverGroups"></div>
+
+      <p class="eyebrow section-heading spaced">Step 3</p>
+      <h2>Check the assumptions</h2>
+      <details class="advanced" id="ratesPanel" style="margin-top:0.4rem;">
+        <summary>Adjust reduction rates</summary>
+        <div style="margin-top:0.9rem;">
+          <p class="source-line" style="margin:0 0 0.8rem; font-size:0.85rem;">Defaults come from the sources listed. If you've measured your own reduction, replace the default with it.</p>
+          <table class="tk-rate-table" id="rateTable"></table>
+          <div class="button-row" style="margin-bottom:0;">
+            <button type="button" class="tk-ghost-btn" id="resetRates">Reset to sourced defaults</button>
+          </div>
+        </div>
+      </details>
+
+    </main>
+
+    <aside class="results-panel">
+      <div class="panel">
+        <h2 style="font-size:1.1rem;">Directional annual impact summary</h2>
+        <div class="result-grid">
+          <div class="result-card primary">
+            <span id="savingsLabel">Estimated annual token savings</span>
+            <strong id="savingsValue" aria-live="polite">Turn on a lever to see an estimate</strong>
+            <p id="savingsPct" style="color:rgba(255,255,255,0.85); margin-top:0.5rem; font-size:0.85rem; font-weight:600;"></p>
+          </div>
+          <div class="result-card tk-gpu-only tk-hidden">
+            <span>Dedicated GPU fleet, per year</span>
+            <strong id="fleetEcho">Not set</strong>
+          </div>
+          <div class="result-card tk-gpu-only tk-hidden">
+            <span>Serverless, same traffic, per year</span>
+            <strong id="serverlessEcho">Not set</strong>
+          </div>
+          <div class="result-card">
+            <span>Levers on</span>
+            <strong id="leversCount">0 of 4</strong>
+          </div>
+          <div class="result-card tk-token-only">
+            <span>Annual token spend</span>
+            <strong id="spendEcho">Not set</strong>
+          </div>
+          <div class="result-card tk-gpu-only tk-hidden">
+            <span>Serverless costs less up to</span>
+            <strong id="breakEvenEcho">Not set</strong>
+          </div>
+        </div>
+
+        <div class="message warning tk-hidden" id="noSpendMsg">Enter your monthly spend in Step 1 to size these levers.</div>
+        <div class="message warning tk-hidden" id="gpuCheaperMsg">At this traffic, the GPU fleet costs less than serverless. Steady, high-volume workloads can favor dedicated capacity, and Capella Model Service offers provisioned GPUs for that case too.</div>
+
+        <button type="button" id="toggleBreakdown" class="tk-ghost-btn" style="margin-top:1rem;" aria-expanded="false" aria-controls="breakdownBox">How we calculate this &#9662;</button>
+        <div class="summary-box" id="breakdownBox" style="display:none;">
+          <table class="tk-breakdown-table" id="breakdownTable"></table>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3 style="font-size:0.95rem;">Levers on</h3>
+        <div id="selectedChips"><span class="tk-chip empty">None yet</span></div>
+      </div>
+
+      <div class="hero-card" style="margin-top:1rem;">
+        <p style="margin:0;"><strong style="color:#fff;">Want these numbers sized against your own traffic?</strong><br>A Couchbase architect can walk through model serving, caching, memory, retrieval, and tool design for your workload in a 30-minute session.</p>
+        <div class="button-row" style="margin-bottom:0;">
+          <a href="https://www.couchbase.com/contact/" target="_blank" rel="noopener" id="ctaPrimary"><button type="button" class="tk-invert-btn">Talk to an architect</button></a>
+        </div>
+        <div class="tk-cta-links">
+          <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Explore the AI Data Plane</a>
+          <a href="https://docs.couchbase.com/ai/get-started/intro.html" target="_blank" rel="noopener">Read the docs</a>
+          <a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener">Estimate database TCO</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="wide-section">
+      <div class="faq-section" style="margin-top:0;">
+        <h2>Token savings estimator FAQ</h2>
+        <p class="subhead">How the estimator works and where the numbers come from.</p>
+        <div class="faq-grid">
+          <details class="faq-item">
+            <summary>Which Couchbase capabilities does this cover?</summary>
+            <p>Serverless models in Capella Model Service, billed by the token, plus four token levers from the Couchbase AI Data Plane&trade;: exact and semantic caching in Model Service, Agent Memory, Hybrid Search with the Vectorization Service, and Agent Catalog tool search. Each lever links to its documentation.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Where do the reduction rates come from?</summary>
+            <p>Caching ranges come from the traffic shape you pick and match the Couchbase Database TCO Calculator. The Agent Memory range is Couchbase's result on the standard LoCoMo benchmark. Retrieval and tool search use figures from published research on the same techniques, so they are not Couchbase benchmarks. Every source is listed in the methodology notes.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Why is the total smaller than the levers added up?</summary>
+            <p>The levers overlap. One request can miss the cache, carry agent memory, retrieve documents, and call tools all at once. The estimator combines the levers so each one only acts on the spend the others leave behind. The same tokens are never counted twice, and the total can never exceed your bill.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Why compare serverless with dedicated GPUs?</summary>
+            <p>A GPU fleet sized for your peak costs the same every hour, busy or idle. Serverless models in Capella Model Service bill per token through Amazon Bedrock, with nothing to pay while your deployment is idle. Token savings also depend on it: on a fixed fleet, sending fewer tokens frees capacity but doesn't change the invoice unless you shrink the fleet.</p>
+          </details>
+          <details class="faq-item">
+            <summary>When do dedicated GPUs cost less?</summary>
+            <p>When traffic is steady and high enough to keep the fleet busy most hours. The estimator shows that case plainly instead of hiding it. Capella Model Service offers both options: serverless models billed by the token, and provisioned GPUs billed by the node-hour.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does this include the cost of running Couchbase?</summary>
+            <p>No. It estimates the model spend you could avoid. It does not net out Capella, embedding model, or Search Service costs, and semantic caching uses some compute of its own. It also leaves out the engineering time to run a GPU fleet. For infrastructure and staffing costs, use the <a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener" style="color:#fff;">Couchbase Database TCO Calculator</a>.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does caching work with serverless models?</summary>
+            <p>Yes. Exact and semantic caching are available when you deploy serverless models in Capella Model Service. The cache is stored in a Capella operational cluster, and semantic caching needs an embedding model deployed alongside it.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I use my own numbers?</summary>
+            <p>Yes. Every input is editable, including GPU rates and model prices. Open "Adjust reduction rates" to replace any lever default with a rate you've measured. The estimate is only as good as those inputs.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Do I need to share my email?</summary>
+            <p>No. The estimate runs in your browser and nothing you enter is sent anywhere.</p>
+          </details>
+        </div>
+      </div>
+
+      <details class="advanced" style="margin-top:2rem;">
+        <summary>Methodology &amp; validation notes</summary>
+        <div class="input-stack" style="margin-top:0.9rem; font-size:0.88rem; color:var(--ink); display:block;">
+          <h3>Two starting points</h3>
+          <p>If you pay per token, the estimator starts from your current monthly token spend. If you run dedicated GPUs, it first prices the same traffic on a serverless model, then applies the levers to that serverless bill. Token savings only lower a bill that is charged per token.</p>
+
+          <h3>Serverless vs. dedicated GPUs</h3>
+          <p><code>dedicated GPUs per year = instances &times; hourly rate &times; hours per month &times; 12</code><br>
+          <code>serverless per year = requests per month &times; 12 &times; (input tokens &times; input price + output tokens &times; output price) &divide; 1,000,000</code><br>
+          <code>total savings = (dedicated &minus; serverless) + lever savings on the serverless bill</code></p>
+          <p>The default fleet is two g6e.12xlarge instances (4&times; NVIDIA L40S each) at the 1-year reserved rate for US East, running all month. The default traffic is a placeholder for you to replace. The break-even figure shows the monthly request volume at which serverless and the fleet cost the same, using only your inputs. Model prices are Amazon Bedrock on-demand list prices for US regions, checked <span data-prices-as-of></span>. Capella Model Service bills serverless models in Capella Credits, and credit consumption varies with then-current Amazon Bedrock rates, so check the rates shown when you deploy before relying on a figure. The comparison assumes the serverless model you pick meets your quality bar and that your fleet can serve the traffic you enter. It leaves out reserved-instance discounts unless you enter them in the hourly rate, and it leaves out the engineering time to run a fleet, which would widen the gap. When the fleet costs less, the estimator says so.</p>
+
+          <h3>Lever math</h3>
+          <p>Each lever you turn on removes part of your annual token spend: <code>annual spend &times; share of spend &times; reduction rate</code>. For caching, the share is the cache-eligible slice of traffic and the rate is the hit rate. Each lever card shows that lever on its own. The total combines them instead of adding them up: <code>annual spend &times; [1 &minus; (1 &minus; lever&nbsp;1) &times; (1 &minus; lever&nbsp;2) &times; &hellip;]</code>, where each lever term is its share &times; rate. In practice, each lever only acts on the spend the others leave behind, so tokens touched by more than one lever count once and the total can never exceed your bill. Low and high ends are calculated separately and shown as a range.</p>
+
+          <h3>Exact and semantic caching (Capella Model Service)</h3>
+          <p>A cache hit is a model call you don't pay for. Capella Model Service stores prompt-response pairs in a Capella operational cluster and matches new prompts by exact text or, with semantic caching, by meaning, so a paraphrased question can still hit. Caching is available for serverless models billed by the token. How often that happens depends on two properties of your traffic: how much of it is cache-eligible, and how often the cache hits within that slice. The four traffic shapes and their ranges match the Couchbase Database TCO Calculator.</p>
+          <ul class="tk-sources" id="archetypeList"></ul>
+
+          <h3>Agent Memory</h3>
+          <p>On the standard LoCoMo benchmark, Agent Memory cuts token usage by 33-45% compared to leading agent memory alternatives. The estimator applies that range to the share of spend you assign to multi-turn agent conversations. Your result depends on how your agents handle context today and on what they write to memory. Benchmark result as of <span data-as-of></span>.</p>
+          <p>Fewer tokens only help if answers stay accurate, so accuracy is worth checking too. On the same benchmark, Agent Memory scores 82.3% (LLM score). The Couchbase engineering team published its test setup and results, including the design trade-offs it made for accuracy, in <a href="https://www.couchbase.com/blog/what-we-learned-evaluating-agent-memorythe-results-part-2/" target="_blank" rel="noopener">What We Learned Evaluating Agent Memory</a>.</p>
+
+          <h3>Hybrid Search retrieval</h3>
+          <p>Published research (Li et al., EMNLP 2024) compared retrieval with long-context prompting across GPT-4o, GPT-3.5-Turbo, and Gemini-1.5-Pro. A retrieval-first approach used 38% to 61% of the long-context token count with comparable answer quality, a 39-62% reduction. Pure retrieval used even fewer tokens but gave up some accuracy, so the estimator uses the more conservative figure. Couchbase Hybrid Search and the Vectorization Service provide the retrieval layer. The figure is the paper's, not a Couchbase benchmark.</p>
+
+          <h3>Agent Catalog tool search</h3>
+          <p>RAG-MCP (2025) tested the pattern of retrieving only the relevant tools before the model sees the prompt. On an MCP stress test, average prompt tokens fell from 2,134 to 1,084 per query, about 49%, and tool-selection accuracy rose from 13.6% to 43.1%. Agent Catalog provides the same step through semantic search over your published tools and prompts. This is one study on one model, so treat it as a starting point and replace it with your own measurement when you have one.</p>
+
+          <h3>Ranges, not points</h3>
+          <p>Most levers show a low&ndash;high range because the source rates are ranges and because your spend has its own variance. Tighten the range by setting share of spend and reduction rates to what you know about your workload.</p>
+
+          <h3>What this tool is not</h3>
+          <p>For per-token spend, it is a top-down estimate against your current bill, not a bottom-up token model. For a GPU fleet there is no token bill to start from, so it prices your traffic bottom-up from the requests and token counts you enter. Either way it is meant to start a discovery conversation, not replace one. It does not include the cost of Couchbase products, other infrastructure, or staff time.</p>
+
+          <h3>Sources</h3>
+          <ul class="tk-sources">
+            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/model-service/configure-value-adds.html" target="_blank" rel="noopener">Configure LLM Value Adds</a> (Model Service caching)</li>
+            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/agent-memory/about-agent-mem.html" target="_blank" rel="noopener">Agent Memory</a></li>
+            <li>Couchbase Blog, <a href="https://www.couchbase.com/blog/what-we-learned-evaluating-agent-memorythe-results-part-2/" target="_blank" rel="noopener">What We Learned Evaluating Agent Memory: The Results (Part 2)</a>, July 2026 (LoCoMo accuracy)</li>
+            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/vectorization-service/data-processing.html" target="_blank" rel="noopener">Vectorization Service</a></li>
+            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/integrate-agent-with-catalog.html" target="_blank" rel="noopener">Integrate an Agent with the Agent Catalog</a></li>
+            <li>Li et al., <a href="https://arxiv.org/abs/2407.16833" target="_blank" rel="noopener">Retrieval Augmented Generation or Long-Context LLMs? A Comprehensive Study and Hybrid Approach</a>, EMNLP 2024 Industry Track, Table 1</li>
+            <li><a href="https://arxiv.org/abs/2505.03275" target="_blank" rel="noopener">RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation</a>, arXiv 2505.03275, 2025, Table 1</li>
+            <li><a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener">Couchbase Database TCO Calculator</a> (caching traffic shapes)</li>
+            <li><a href="https://aws.amazon.com/bedrock/pricing/" target="_blank" rel="noopener">Amazon Bedrock pricing</a> (serverless model list prices)</li>
+            <li><a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">Amazon EC2 On-Demand pricing</a> (g6e.12xlarge default rate)</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="advanced" style="margin-top:1rem;">
+        <summary>Disclaimer</summary>
+        <div class="input-stack" style="margin-top:0.9rem; font-size:0.88rem; color:var(--ink); display:block;">
+          <p><strong>Disclaimer.</strong> This tool provides directional, illustrative estimates only and is not a quote, offer, or guarantee of savings, pricing, or performance. It is intended to support evaluation and discovery conversations, not as the sole basis for a purchasing decision.</p>
+          <p>The Agent Memory range reflects Couchbase results on the standard LoCoMo benchmark as of <span data-as-of></span>. Retrieval and tool search figures come from third-party published research and were not produced by Couchbase. Caching ranges are workload assumptions. GPU rates and model prices are list prices that change over time, and Capella Credit consumption for serverless models varies with then-current Amazon Bedrock rates. Actual savings depend on your workload, data, model choices, and agent behavior, and may differ materially from the estimates shown. Estimates do not include the cost of Couchbase products or other infrastructure. This tool does not constitute financial, legal, procurement, or professional advice. Couchbase makes no warranty, express or implied, as to the accuracy or completeness of the information provided and disclaims liability for decisions made in reliance on it.</p>
+        </div>
+      </details>
+  </section>
+
+  <footer>
+    Couchbase AI Data Plane Token Savings Estimator. Figures are estimates for discussion purposes and are not a binding quote.
+    <p style="font-size:0.72rem; color:var(--muted); line-height:1.5; margin-top:0.75rem;">
+      Couchbase&reg; is a registered trademark of Couchbase, Inc. All other trademarks are the property of their respective
+      owners. Use of these marks does not imply any sponsorship, endorsement, or affiliation between Couchbase and the
+      respective trademark owners.
+    </p>
+  </footer>
+
+<script>
+/* ============================================================
+   CONFIG: values the web team or Legal may need to change
+   ============================================================ */
+
+/* Date shown next to the Agent Memory LoCoMo result.
+   TODO(confirm with Legal): the approval asks for an "as of [DATE]" on decks; confirm the date to show on the web. */
+const AGENT_MEMORY_AS_OF = 'October 2026';
+
+/* Traffic shapes for the caching lever. Same values and labels as the live
+   Couchbase Database TCO Calculator so the two tools agree. */
+const ARCHETYPES = {
+  unknown: { label: 'Not sure yet',          addressable: 0.45, hitLow: 0.15, hitHigh: 0.40, blurb: 'A generic 7–18% of total model spend.' },
+  faq:     { label: 'FAQ knowledge base',    addressable: 0.70, hitLow: 0.35, hitHigh: 0.60, blurb: 'A finite question set, asked over and over. 25–42% of total model spend.' },
+  rag:     { label: 'RAG / document search', addressable: 0.55, hitLow: 0.20, hitHigh: 0.40, blurb: 'Retrieval over a corpus. Intent repeats, wording varies. 11–22% of total model spend.' },
+  chat:    { label: 'Free-form agent chat',  addressable: 0.35, hitLow: 0.05, hitHigh: 0.20, blurb: 'Long, unique, multi-turn context. Little repetition. 2–7% of total model spend.' },
+};
+
+/* Dedicated GPU vs. serverless comparison (Step 1, "Dedicated GPUs" path). */
+
+/* Date shown next to model and GPU list prices. Update whenever the prices below are re-checked. */
+const PRICES_AS_OF = 'November 2026';
+
+/* Default fleet: two g6e.12xlarge (4x NVIDIA L40S each), always on, at the 1-year reserved rate.
+   Deliberately smaller and cheaper than the AIDP Air storm demo's fleet (four instances at on-demand),
+   which was sized for a burst peak. A generic visitor's always-on fleet is more likely on reserved pricing. */
+const GPU_DEFAULTS = { instances: 2, hours: 730, pricing: 'reserved1' };
+
+/* g6e.12xlarge hourly rates, Linux, US East (same on-demand rate in us-east-1 and us-east-2).
+   TODO(confirm): re-check against aws.amazon.com/ec2/pricing before launch. */
+const GPU_RATE_PRESETS = {
+  ondemand:  { label: 'On-demand',            rate: 10.49 },
+  reserved1: { label: '1-yr reserved',        rate: 6.61 },
+  reserved3: { label: '3-yr reserved',        rate: 4.53 },
+  custom:    { label: 'Custom rate' },
+};
+
+/* Default traffic. These are placeholders for the visitor to replace, not benchmarks. */
+const TRAFFIC_DEFAULTS = { requests: 1000000, inTok: 2000, outTok: 400 };
+
+/* Serverless model presets: Amazon Bedrock on-demand list prices, USD per 1M tokens, US regions.
+   TODO(confirm): re-check against aws.amazon.com/bedrock/pricing and the Capella Credit rates shown
+   on the Model Service deploy screen before launch. */
+const MODEL_PRESETS = {
+  novaMicro: { label: 'Nova Micro',  full: 'Amazon Nova Micro',  in: 0.035, out: 0.14 },
+  novaLite:  { label: 'Nova Lite',   full: 'Amazon Nova Lite',   in: 0.06,  out: 0.24 },
+  nova2Lite: { label: 'Nova 2 Lite', full: 'Amazon Nova 2 Lite', in: 0.33,  out: 2.75 },
+  novaPro:   { label: 'Nova Pro',    full: 'Amazon Nova Pro',    in: 0.80,  out: 3.20 },
+  custom:    { label: 'Custom',      full: 'custom price' },
+};
+const DEFAULT_MODEL = 'nova2Lite';
+
+/* The four levers. Each one's estimate is shown on its own; the total combines them (see computeTotal). */
+const LEVERS = [
+  {
+    id: 'caching',
+    name: 'Exact and semantic caching',
+    product: 'Capella Model Service',
+    type: 'archetype',
+    blurb: 'Repeated and paraphrased prompts are answered from cache without a new model call.',
+    sourceTag: 'rate set by your traffic shape',
+    source: 'Capella Model Service stores prompt-response pairs in a Capella operational cluster and matches new prompts by exact text or by meaning (semantic caching, which needs an embedding model). It works with serverless models billed by the token. A cache hit is a model call you don\'t pay for. How often that happens depends on how repetitive your traffic is, so pick the closest shape. These ranges match the Couchbase Database TCO Calculator. <a href="https://docs.couchbase.com/ai/build/model-service/configure-value-adds.html" target="_blank" rel="noopener">Model Service caching docs</a>',
+  },
+  {
+    id: 'agentMemory',
+    name: 'Agent Memory',
+    product: 'Agent Memory',
+    type: 'share',
+    blurb: 'Agents recall the memories that matter for each turn instead of resending the whole conversation.',
+    shareLabel: '% of spend on multi-turn agent conversations',
+    shareDefault: 25,
+    rateLow: 0.33, rateHigh: 0.45,
+    sourceTag: 'LoCoMo benchmark',
+    rateSource: 'Couchbase, LoCoMo benchmark',
+    /* The first sentence is Legal-approved website wording. Do not edit it without Legal sign-off.
+       The 82.3% accuracy figure matches the live AI Data Plane product page and the Couchbase blog cited below. */
+    source: 'On the standard LoCoMo benchmark, Agent Memory cuts token usage by 33-45% compared to leading agent memory alternatives. On accuracy, Agent Memory scores 82.3% on LoCoMo (LLM score). Your result depends on how your agents handle context today. <a href="https://docs.couchbase.com/ai/build/agent-memory/about-agent-mem.html" target="_blank" rel="noopener">Agent Memory docs</a> · <a href="https://www.couchbase.com/blog/what-we-learned-evaluating-agent-memorythe-results-part-2/" target="_blank" rel="noopener">How we tested</a>',
+  },
+  {
+    id: 'retrieval',
+    name: 'Hybrid Search retrieval',
+    product: 'Hybrid Search + Vectorization Service',
+    type: 'share',
+    blurb: 'Prompts carry the passages that answer the question instead of whole documents.',
+    shareLabel: '% of spend on document-heavy or long-context prompts',
+    shareDefault: 30,
+    rateLow: 0.39, rateHigh: 0.62,
+    sourceTag: 'published research',
+    rateSource: 'Li et al., EMNLP 2024',
+    source: 'Couchbase Hybrid Search runs vector, full-text, and SQL in one query, and the Vectorization Service generates embeddings from your data. The range comes from published research comparing retrieval with long-context prompting: a retrieval-first approach used 39-62% fewer tokens with comparable answer quality (Li et al., EMNLP 2024). It is not a Couchbase benchmark. <a href="https://docs.couchbase.com/ai/build/vectorization-service/data-processing.html" target="_blank" rel="noopener">Vectorization Service docs</a>',
+  },
+  {
+    id: 'toolSearch',
+    name: 'Agent Catalog tool search',
+    product: 'Agent Catalog',
+    type: 'share',
+    blurb: 'Agents search the catalog for the tools a request needs instead of sending every tool definition on every call.',
+    shareLabel: '% of spend on agent calls that send tool definitions',
+    shareDefault: 15,
+    rateLow: 0.49, rateHigh: 0.49,
+    sourceTag: 'published research',
+    rateSource: 'RAG-MCP, 2025',
+    source: 'Agent Catalog lets an agent search for the tools that fit the question, using semantic search across catalogs of hundreds of tools (requires the Search Service). Published research on the same pattern (RAG-MCP, 2025) cut average prompt tokens from 2,134 to 1,084 per query, about 49%, while tool-selection accuracy more than tripled. It is not a Couchbase benchmark. <a href="https://docs.couchbase.com/ai/build/integrate-agent-with-catalog.html" target="_blank" rel="noopener">Agent Catalog docs</a>',
+  },
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  mode: 'token',   // 'token' = pays per token today, 'gpu' = runs dedicated GPUs today
+  monthlySpend: 20000,
+  enabled: new Set(),
+  shares: {},   // leverId -> % (0-100)
+  rates: {},    // leverId -> { low, high } as fractions
+  archetype: 'unknown',
+  gpu: { instances: GPU_DEFAULTS.instances, hours: GPU_DEFAULTS.hours, hourly: GPU_RATE_PRESETS[GPU_DEFAULTS.pricing].rate },
+  gpuPricing: GPU_DEFAULTS.pricing,
+  traffic: { ...TRAFFIC_DEFAULTS },
+  model: DEFAULT_MODEL,
+  price: { in: MODEL_PRESETS[DEFAULT_MODEL].in, out: MODEL_PRESETS[DEFAULT_MODEL].out },
+};
+function resetRates(){
+  LEVERS.forEach(l => { if(l.type === 'share') state.rates[l.id] = { low: l.rateLow, high: l.rateHigh }; });
+}
+LEVERS.forEach(l => { if(l.type === 'share') state.shares[l.id] = l.shareDefault; });
+resetRates();
+
+/* ============================================================
+   MATH
+   ============================================================ */
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function fmtUSD(n){ return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }); }
+function pct(f){ return `${Math.round(f * 100)}%`; }
+function fmtRange(lo, hi, f){ return Math.round(lo) === Math.round(hi) ? f(lo) : `${f(lo)} – ${f(hi)}`; }
+function rateLabel(r){ return Math.round(r.low * 100) === Math.round(r.high * 100) ? pct(r.low) : `${Math.round(r.low * 100)}–${pct(r.high)}`; }
+const nz = v => Math.max(0, Number(v) || 0);
+
+/* Dedicated GPU fleet cost per year. */
+function fleetAnnual(){ return nz(state.gpu.instances) * nz(state.gpu.hourly) * nz(state.gpu.hours) * 12; }
+
+/* The same traffic priced on a serverless model, per year. */
+function serverlessAnnual(){
+  const t = state.traffic, p = state.price;
+  return nz(t.requests) * 12 * (nz(t.inTok) * nz(p.in) + nz(t.outTok) * nz(p.out)) / 1e6;
+}
+
+/* The per-token bill the levers act on: current spend, or the serverless bill on the GPU path. */
+function annualSpend(){ return state.mode === 'gpu' ? serverlessAnnual() : nz(state.monthlySpend) * 12; }
+function isCustom(l){ return l.type === 'share' && (state.rates[l.id].low !== l.rateLow || state.rates[l.id].high !== l.rateHigh); }
+
+/* Fraction of the spend it touches that a lever removes (share x rate), low and high. */
+function leverFraction(l){
+  if(l.type === 'archetype'){
+    const a = ARCHETYPES[state.archetype] || ARCHETYPES.unknown;
+    return {
+      low: a.addressable * a.hitLow,
+      high: a.addressable * a.hitHigh,
+      detail: `${pct(a.addressable)} cache-eligible × ${Math.round(a.hitLow * 100)}–${pct(a.hitHigh)} hit rate`,
+    };
+  }
+  const share = clamp(state.shares[l.id] ?? l.shareDefault, 0, 100) / 100;
+  const r = state.rates[l.id];
+  const lo = Math.min(r.low, r.high), hi = Math.max(r.low, r.high);
+  return {
+    low: share * lo,
+    high: share * hi,
+    detail: `${pct(share)} of spend × ${rateLabel({ low: lo, high: hi })}${isCustom(l) ? ' custom rate' : ''}`,
+  };
+}
+
+/* Each row is a lever's estimate on its own. The total combines levers instead of adding them:
+   total = annual x [1 - (1 - f1)(1 - f2)...], so each lever only acts on the spend the others
+   leave behind. Overlapping tokens are counted once and the total can never exceed annual spend.
+   The result does not depend on lever order. */
+function computeTotal(){
+  const annual = annualSpend();
+  let keepLow = 1, keepHigh = 1, sumLow = 0, sumHigh = 0;
+  const rows = [];
+  LEVERS.forEach(l => {
+    if(!state.enabled.has(l.id)) return;
+    const f = leverFraction(l);
+    keepLow *= (1 - f.low); keepHigh *= (1 - f.high);
+    const row = { lever: l, low: annual * f.low, high: annual * f.high, detail: f.detail };
+    sumLow += row.low; sumHigh += row.high;
+    rows.push(row);
+  });
+  const low = annual * (1 - keepLow), high = annual * (1 - keepHigh);
+  return { rows, low, high, overlapLow: sumLow - low, overlapHigh: sumHigh - high, n: rows.length, annual };
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+function badgeText(l){
+  const prefix = l.product && l.product !== l.name ? `${l.product} · ` : '';
+  if(l.type === 'archetype') return `${prefix}${l.sourceTag}`;
+  if(isCustom(l)) return `${prefix}custom rate ${rateLabel(state.rates[l.id])}`;
+  return `${prefix}${rateLabel(state.rates[l.id])}, ${l.sourceTag}`;
+}
+
+function buildLeverGroups(){
+  const wrap = document.getElementById('leverGroups');
+  wrap.innerHTML = LEVERS.map((l, i) => {
+    let controlsHTML = '';
+    if(l.type === 'archetype'){
+      controlsHTML = `
+        <p class="source-line" style="margin:0 0 0.4rem; font-weight:700; color:var(--ink); font-size:0.82rem;">What shape is your traffic?</p>
+        <div class="archetype-grid" role="radiogroup" aria-label="Traffic shape">
+          ${Object.entries(ARCHETYPES).map(([key, a]) => `
+            <label><input type="radio" name="archetype" value="${key}" ${state.archetype === key ? 'checked' : ''}>${a.label}</label>
+          `).join('')}
+        </div>
+        <p class="source-line" id="archetypeBlurb">${(ARCHETYPES[state.archetype] || ARCHETYPES.unknown).blurb}</p>`;
+    } else {
+      controlsHTML = `
+        <div class="row">
+          <label for="share-${l.id}">${l.shareLabel}</label>
+          <output for="share-${l.id}" data-share-out="${l.id}">${state.shares[l.id]}%</output>
+        </div>
+        <input type="range" id="share-${l.id}" min="0" max="100" step="1" value="${state.shares[l.id]}" data-share-input="${l.id}">`;
+    }
+    return `
+      <div class="tool-group" data-lever="${l.id}">
+        <label class="check-card" style="align-items:center;">
+          <input type="checkbox" data-lever-toggle="${l.id}" ${state.enabled.has(l.id) ? 'checked' : ''}>
+          <span style="display:block;">
+            <span>${i + 1}. ${l.name}<span class="tk-tip" tabindex="0" role="button" aria-label="Source and details for ${l.name}">&#9432;<span class="tk-tip-bubble">${l.source}</span></span> <span class="tk-badge" data-badge="${l.id}">${badgeText(l)}</span></span>
+            <small>${l.blurb}</small>
+          </span>
+        </label>
+        <div class="tk-lever-controls ${state.enabled.has(l.id) ? '' : 'tk-hidden'}" data-lever-controls="${l.id}">
+          ${controlsHTML}
+          <div class="tk-lever-savings" data-lever-savings="${l.id}" aria-live="polite"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('[data-lever-toggle]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const id = chk.dataset.leverToggle;
+      if(chk.checked) state.enabled.add(id); else state.enabled.delete(id);
+      wrap.querySelector(`[data-lever-controls="${id}"]`).classList.toggle('tk-hidden', !chk.checked);
+      render();
+    });
+  });
+
+  wrap.querySelectorAll('[data-share-input]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const id = inp.dataset.shareInput;
+      state.shares[id] = parseInt(inp.value, 10) || 0;
+      wrap.querySelector(`[data-share-out="${id}"]`).textContent = `${state.shares[id]}%`;
+      render();
+    });
+  });
+
+  wrap.querySelectorAll('input[name="archetype"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if(!e.target.checked) return;
+      state.archetype = e.target.value;
+      const blurb = wrap.querySelector('#archetypeBlurb');
+      if(blurb) blurb.textContent = ARCHETYPES[state.archetype].blurb;
+      buildRateTable();
+      render();
+    });
+  });
+
+  wrap.querySelectorAll('.tk-tip').forEach(tip => {
+    const toggle = (e) => {
+      if(e.target.closest('a')) return; // let links inside the bubble work
+      e.preventDefault();
+      e.stopPropagation();
+      const wasOpen = tip.classList.contains('tk-tip-show');
+      document.querySelectorAll('.tk-tip-show').forEach(t => t.classList.remove('tk-tip-show'));
+      if(!wasOpen) tip.classList.add('tk-tip-show');
+    };
+    tip.addEventListener('click', toggle);
+    tip.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') toggle(e); });
+  });
+}
+
+function buildRateTable(){
+  const t = document.getElementById('rateTable');
+  const rows = LEVERS.map(l => {
+    if(l.type === 'archetype'){
+      return `<tr><td>${l.name}<span class="src">Set by traffic shape in Step 2</span></td><td colspan="2" style="color:var(--muted);">${ARCHETYPES[state.archetype].label}</td></tr>`;
+    }
+    const r = state.rates[l.id];
+    return `<tr>
+      <td>${l.name}<span class="src">Default ${rateLabel({ low: l.rateLow, high: l.rateHigh })} · ${l.rateSource}</span>${isCustom(l) ? ' <span class="tk-custom-flag">custom</span>' : ''}</td>
+      <td><label class="sr-only" for="rateLow-${l.id}">${l.name} low rate (%)</label><input type="number" min="0" max="100" step="1" id="rateLow-${l.id}" data-rate="${l.id}" data-end="low" value="${Math.round(r.low * 100)}"></td>
+      <td><label class="sr-only" for="rateHigh-${l.id}">${l.name} high rate (%)</label><input type="number" min="0" max="100" step="1" id="rateHigh-${l.id}" data-rate="${l.id}" data-end="high" value="${Math.round(r.high * 100)}"></td>
+    </tr>`;
+  }).join('');
+  t.innerHTML = `<thead><tr><th>Lever</th><th>Low %</th><th>High %</th></tr></thead><tbody>${rows}</tbody>`;
+  t.querySelectorAll('[data-rate]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const id = inp.dataset.rate, end = inp.dataset.end;
+      const v = clamp(parseFloat(inp.value) || 0, 0, 100);
+      inp.value = v;
+      state.rates[id][end] = v / 100;
+      buildRateTable();
+      render();
+    });
+  });
+}
+
+/* Monthly requests at which serverless costs the same as the fleet. Uses only the visitor's inputs. */
+function breakEvenRequests(){
+  const perReq = (nz(state.traffic.inTok) * nz(state.price.in) + nz(state.traffic.outTok) * nz(state.price.out)) / 1e6;
+  return perReq > 0 ? fleetAnnual() / 12 / perReq : 0;
+}
+function fmtCount(n){
+  if(n >= 1e6) return `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)}M`;
+  if(n >= 1e3) return `${Math.round(n / 1e3)}K`;
+  return `${Math.round(n)}`;
+}
+function fmtMultiple(x){ return x >= 10 ? `${Math.round(x).toLocaleString('en-US')}×` : `${x.toFixed(1)}×`; }
+
+function render(){
+  const gpu = state.mode === 'gpu';
+  const r = computeTotal();
+  const R = fleetAnnual(), S = serverlessAnnual(), D = R - S;
+  const ready = gpu ? (R > 0 && S > 0) : r.annual > 0;
+  const spend = ready ? r.annual / 12 : 0;   // monthly per-token bill the levers act on
+
+  document.querySelectorAll('.tk-gpu-only').forEach(el => el.classList.toggle('tk-hidden', !gpu));
+  document.querySelectorAll('.tk-token-only').forEach(el => el.classList.toggle('tk-hidden', gpu));
+  document.getElementById('spendEcho').textContent = r.annual > 0 ? fmtUSD(r.annual) : 'Not set';
+  document.getElementById('fleetEcho').textContent = R > 0 ? fmtUSD(R) : 'Not set';
+  document.getElementById('serverlessEcho').textContent = S > 0 ? fmtUSD(S) : 'Not set';
+  const be = breakEvenRequests();
+  document.getElementById('breakEvenEcho').textContent = be > 0 ? `${fmtCount(be)} requests/mo` : 'Not set';
+  const noSpend = document.getElementById('noSpendMsg');
+  noSpend.textContent = gpu ? 'Enter your GPU fleet and traffic in Step 1 to compare.' : 'Enter your monthly spend in Step 1 to size these levers.';
+  noSpend.classList.toggle('tk-hidden', ready);
+  document.getElementById('gpuCheaperMsg').classList.toggle('tk-hidden', !(gpu && ready && D <= 0));
+  document.getElementById('leversCount').textContent = `${r.n} of ${LEVERS.length}`;
+  document.getElementById('savingsLabel').textContent = gpu ? 'Estimated annual savings' : 'Estimated annual token savings';
+
+  const savingsEl = document.getElementById('savingsValue');
+  const savingsPctEl = document.getElementById('savingsPct');
+  const leverPart = r.n ? fmtRange(r.low, r.high, fmtUSD) : '';
+  if(gpu){
+    if(!ready){
+      savingsEl.textContent = 'Enter your fleet and traffic to compare';
+      savingsPctEl.textContent = '';
+    } else {
+      const lo = D + r.low, hi = D + r.high;
+      if(hi <= 0){
+        savingsEl.textContent = 'No savings at this traffic';
+      } else if(lo < 0){
+        savingsEl.textContent = `Up to ${fmtUSD(hi)}`;
+      } else {
+        savingsEl.textContent = fmtRange(lo, hi, fmtUSD);
+      }
+      savingsPctEl.textContent = D > 0
+        ? `per year: ${fmtUSD(D)} from moving this traffic to serverless${r.n ? `, plus ${leverPart} from the levers below` : ''}.`
+        : `per year. Before the levers, serverless costs ${fmtUSD(-D)} more than the fleet for this traffic${r.n ? `, and the levers below save ${leverPart} on the serverless bill` : ''}.`;
+    }
+  } else if(r.n === 0 || !ready){
+    savingsEl.textContent = 'Turn on a lever to see an estimate';
+    savingsPctEl.textContent = '';
+  } else {
+    savingsEl.textContent = fmtRange(r.low, r.high, fmtUSD);
+    savingsPctEl.textContent = `per year, or ${rateLabel({ low: r.low / r.annual, high: r.high / r.annual })} of your annual token spend.`;
+  }
+
+  document.getElementById('selectedChips').innerHTML = r.n === 0
+    ? '<span class="tk-chip empty">None yet</span>'
+    : r.rows.map(row => `<span class="tk-chip">${row.lever.name}</span>`).join('');
+
+  LEVERS.forEach(l => {
+    const badge = document.querySelector(`[data-badge="${l.id}"]`);
+    if(badge) badge.textContent = badgeText(l);
+    const el = document.querySelector(`[data-lever-savings="${l.id}"]`);
+    if(!el) return;
+    const row = r.rows.find(x => x.lever.id === l.id);
+    if(!row || spend <= 0){ el.textContent = ''; return; }
+    el.textContent = `${fmtRange(row.low, row.high, fmtUSD)}/yr on its own (${row.detail})`;
+  });
+
+  const bt = document.getElementById('breakdownTable');
+  const leverRows = () => {
+    let html = r.rows.map(row => `<tr><td>${row.lever.name} (${row.detail})</td><td>${fmtRange(row.low, row.high, fmtUSD)}/yr</td></tr>`).join('');
+    if(r.n > 1) html += `<tr><td>Less overlap between levers</td><td>${fmtRange(r.overlapLow, r.overlapHigh, v => '−' + fmtUSD(v))}/yr</td></tr>`;
+    return html;
+  };
+  const combineNote = 'The levers are combined rather than added, so tokens that more than one lever touches are counted once.';
+  if(gpu){
+    if(!ready){
+      bt.innerHTML = `<tr><td colspan="2">Enter your GPU fleet and traffic in Step 1 to see the breakdown.</td></tr>`;
+    } else {
+      const g = state.gpu, t = state.traffic;
+      const modelName = (MODEL_PRESETS[state.model] || MODEL_PRESETS.custom).full;
+      const rateName = (GPU_RATE_PRESETS[state.gpuPricing] || GPU_RATE_PRESETS.custom).label.toLowerCase();
+      let html = `<tr><td>Dedicated GPU fleet (${nz(g.instances)} × ${fmtUSD2(nz(g.hourly))}/hr ${rateName} × ${nz(g.hours)} hrs/mo × 12)</td><td>${fmtUSD(R)}/yr</td></tr>`;
+      html += `<tr><td>Serverless, same traffic (${nz(t.requests).toLocaleString('en-US')} requests/mo × ${nz(t.inTok).toLocaleString('en-US')} in + ${nz(t.outTok).toLocaleString('en-US')} out tokens, ${modelName})</td><td>−${fmtUSD(S)}/yr</td></tr>`;
+      html += `<tr><td><strong>${D >= 0 ? 'Savings from moving to serverless' : 'Extra cost of serverless'}</strong></td><td><strong>${fmtUSD(Math.abs(D))}/yr</strong></td></tr>`;
+      html += `<tr><td colspan="2" style="text-align:left; color:var(--muted);">The fleet costs ${fmtMultiple(R / S)} what serverless would for this traffic. Serverless stays cheaper up to about ${fmtCount(breakEvenRequests())} requests a month at these token counts and prices.</td></tr>`;
+      if(r.n){
+        html += `<tr><td colspan="2" style="color:var(--muted); padding-top:0.7rem; text-align:left;">Levers, applied to the serverless bill:</td></tr>`;
+        html += leverRows();
+        html += `<tr><td><strong>Lever savings</strong></td><td><strong>${leverPart}/yr</strong></td></tr>`;
+      }
+      html += `<tr><td colspan="2"><span class="tk-breakdown-note">Fleet and model prices are list prices as of ${PRICES_AS_OF}. Capella bills serverless models in Capella Credits. ${r.n ? combineNote : ''}</span></td></tr>`;
+      bt.innerHTML = html;
+    }
+  } else if(r.n === 0 || !ready){
+    bt.innerHTML = `<tr><td colspan="2">Enter your spend and turn on a lever to see the breakdown.</td></tr>`;
+  } else {
+    let html = leverRows();
+    html += `<tr><td><strong>Estimated annual token savings</strong></td><td><strong>${fmtRange(r.low, r.high, fmtUSD)}/yr</strong></td></tr>`;
+    html += `<tr><td colspan="2"><span class="tk-breakdown-note">Based on ${fmtUSD(r.annual)}/yr in token spend (${fmtUSD(spend)}/mo). ${combineNote}</span></td></tr>`;
+    bt.innerHTML = html;
+  }
+}
+
+function fmtUSD2(n){ return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+/* ===== Step 1 wiring: payment mode, GPU fleet, traffic, and model price ===== */
+function setMode(mode){
+  state.mode = mode;
+  document.getElementById('tokenInputs').classList.toggle('tk-hidden', mode !== 'token');
+  document.getElementById('gpuInputs').classList.toggle('tk-hidden', mode !== 'gpu');
+  document.getElementById('gpuLeverNote').classList.toggle('tk-hidden', mode !== 'gpu');
+  render();
+}
+document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', e => { if(e.target.checked) setMode(e.target.value); });
+});
+
+const GPU_FIELDS = [
+  ['gpuInstances', () => state.gpu, 'instances'],
+  ['gpuHourly',    () => state.gpu, 'hourly'],
+  ['gpuHours',     () => state.gpu, 'hours'],
+  ['reqMonth',     () => state.traffic, 'requests'],
+  ['inTok',        () => state.traffic, 'inTok'],
+  ['outTok',       () => state.traffic, 'outTok'],
+];
+GPU_FIELDS.forEach(([id, obj, key]) => {
+  const el = document.getElementById(id);
+  el.value = obj()[key];
+  el.addEventListener('input', () => { obj()[key] = nz(el.value); render(); });
+});
+document.querySelectorAll('[data-req]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.traffic.requests = parseInt(btn.dataset.req, 10);
+    document.getElementById('reqMonth').value = state.traffic.requests;
+    render();
+  });
+});
+
+const gpuSel = document.getElementById('gpuPricing'), gpuHourly = document.getElementById('gpuHourly');
+gpuSel.innerHTML = Object.entries(GPU_RATE_PRESETS).map(([k, g]) => `<option value="${k}">${g.label}</option>`).join('');
+gpuSel.value = state.gpuPricing;
+document.getElementById('gpuPriceNote').textContent = `Rates for a g6e.12xlarge (4× NVIDIA L40S) in US East, checked ${PRICES_AS_OF}. An always-on fleet usually runs on reserved pricing, so that's the default.`;
+gpuSel.addEventListener('change', () => {
+  state.gpuPricing = gpuSel.value;
+  const g = GPU_RATE_PRESETS[state.gpuPricing];
+  if(g.rate !== undefined){ state.gpu.hourly = g.rate; gpuHourly.value = g.rate; }
+  render();
+});
+gpuHourly.addEventListener('input', () => {
+  const g = GPU_RATE_PRESETS[state.gpuPricing];
+  if(g.rate === undefined || g.rate !== state.gpu.hourly){ state.gpuPricing = 'custom'; gpuSel.value = 'custom'; }
+  render();
+});
+
+const presetSel = document.getElementById('modelPreset');
+presetSel.innerHTML = Object.entries(MODEL_PRESETS).map(([k, m]) => `<option value="${k}">${m.label}</option>`).join('');
+presetSel.value = state.model;
+document.getElementById('priceNote').textContent = `Amazon Nova models, at Amazon Bedrock on-demand list prices for US regions, checked ${PRICES_AS_OF}. Capella bills serverless models in Capella Credits at the rates shown when you deploy.`;
+const priceIn = document.getElementById('priceIn'), priceOut = document.getElementById('priceOut');
+priceIn.value = state.price.in; priceOut.value = state.price.out;
+presetSel.addEventListener('change', () => {
+  state.model = presetSel.value;
+  const m = MODEL_PRESETS[state.model];
+  if(m.in !== undefined){
+    state.price = { in: m.in, out: m.out };
+    priceIn.value = m.in; priceOut.value = m.out;
+  }
+  render();
+});
+[[priceIn, 'in'], [priceOut, 'out']].forEach(([el, key]) => {
+  el.addEventListener('input', () => {
+    state.price[key] = nz(el.value);
+    const m = MODEL_PRESETS[state.model];
+    if(m.in === undefined || m.in !== state.price.in || m.out !== state.price.out){
+      state.model = 'custom'; presetSel.value = 'custom';
+    }
+    render();
+  });
+});
+document.querySelectorAll('[data-prices-as-of]').forEach(el => { el.textContent = PRICES_AS_OF; });
+
+function buildArchetypeList(){
+  document.getElementById('archetypeList').innerHTML = Object.values(ARCHETYPES).map(a =>
+    `<li><strong>${a.label}:</strong> ${pct(a.addressable)} cache-eligible × ${Math.round(a.hitLow * 100)}–${pct(a.hitHigh)} hit rate. ${a.blurb}</li>`
+  ).join('');
+}
+
+function setSpend(v){
+  v = Math.max(0, Math.round(v));
+  state.monthlySpend = v;
+  document.getElementById('monthlySpend').value = v;
+  render();
+}
+document.getElementById('monthlySpend').addEventListener('input', e => {
+  state.monthlySpend = Math.max(0, parseFloat(e.target.value) || 0);
+  render();
+});
+document.querySelectorAll('.button-row [data-spend]').forEach(btn => {
+  btn.addEventListener('click', () => setSpend(parseInt(btn.dataset.spend, 10)));
+});
+
+document.getElementById('toggleBreakdown').addEventListener('click', () => {
+  const box = document.getElementById('breakdownBox');
+  const btn = document.getElementById('toggleBreakdown');
+  const showing = box.style.display !== 'none';
+  box.style.display = showing ? 'none' : 'block';
+  btn.setAttribute('aria-expanded', String(!showing));
+  btn.innerHTML = showing ? 'How we calculate this &#9662;' : 'How we calculate this &#9652;';
+});
+
+document.getElementById('resetRates').addEventListener('click', () => {
+  resetRates();
+  buildRateTable();
+  render();
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.tk-tip-show').forEach(t => t.classList.remove('tk-tip-show'));
+});
+
+document.querySelectorAll('[data-as-of]').forEach(el => { el.textContent = AGENT_MEMORY_AS_OF; });
+
+buildLeverGroups();
+buildRateTable();
+buildArchetypeList();
+render();
+</script>
+</body>
+</html>
