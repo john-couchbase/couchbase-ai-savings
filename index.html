@@ -325,6 +325,27 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
   .tk-tip-bubble::after { left: auto; right: 0.7rem; transform: none; }
 }
 
+/* ===== Before/after bars ===== */
+.tk-compare { grid-column: 1 / -1; position: relative; border: 1px solid var(--line); border-radius: 1rem; padding: 1rem; background: #fff; }
+.tk-compare h3 { font-size: 0.95rem; margin: 0 0 0.15rem; }
+.tk-compare-sub { margin: 0 0 0.8rem; color: var(--muted); font-size: 0.8rem; }
+.tk-compare-row { padding: 0.35rem 0; border-radius: 0.5rem; outline: none; cursor: default; }
+.tk-compare-row:focus-visible { box-shadow: 0 0 0 2px rgba(227, 27, 35, 0.35); }
+.tk-compare-row + .tk-compare-row { margin-top: 0.5rem; }
+.tk-compare-label { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; font-size: 0.82rem; color: var(--muted); font-weight: 650; margin-bottom: 0.3rem; }
+.tk-compare-label strong { color: var(--ink); font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+.tk-compare-track { display: flex; align-items: center; height: 20px; border-left: 1px solid var(--line); }
+.tk-bar { height: 20px; border-radius: 0 4px 4px 0; transition: width 0.25s ease, filter 0.15s ease; min-width: 2px; }
+.tk-bar-today { background: #8f897f; }
+.tk-bar-after { background: var(--cb-red); }
+.tk-bar-after.tk-bar-joined { border-radius: 0; }
+.tk-bar-range { height: 20px; margin-left: 2px; border-radius: 0 4px 4px 0; background: #f6b9bb; transition: width 0.25s ease; }
+.tk-compare-row.is-active .tk-bar, .tk-compare-row.is-active .tk-bar-range { filter: brightness(1.08); }
+.tk-compare-foot { margin: 0.7rem 0 0; font-size: 0.85rem; font-weight: 750; color: var(--ink); }
+.tk-tooltip { position: absolute; z-index: 20; background: var(--ink); color: #d8dce2; border-radius: 0.45rem; padding: 0.2rem 0.55rem; font-size: 0.74rem; line-height: 1.35; box-shadow: var(--shadow); pointer-events: none; white-space: nowrap; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; }
+.tk-tooltip strong { color: #fff; font-size: 0.8rem; }
+@media (prefers-reduced-motion: reduce) { .tk-bar, .tk-bar-range { transition: none; } }
+
 /* ===== Step 1 payment mode ===== */
 .tk-mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
 @media (max-width: 640px) { .tk-mode-grid { grid-template-columns: 1fr; } }
@@ -562,6 +583,20 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
             <span id="savingsLabel">Estimated annual token savings</span>
             <strong id="savingsValue" aria-live="polite">Turn on a lever to see an estimate</strong>
             <p id="savingsPct" style="color:rgba(255,255,255,0.85); margin-top:0.5rem; font-size:0.85rem; font-weight:600;"></p>
+          </div>
+          <div class="tk-compare tk-hidden" id="compareBlock" role="group" aria-labelledby="compareTitle">
+            <h3 id="compareTitle">Your annual model bill</h3>
+            <p class="tk-compare-sub">The lighter band shows the range of the estimate.</p>
+            <div class="tk-compare-row" data-row="today" tabindex="0">
+              <div class="tk-compare-label"><span id="todayLabel">Today</span><strong id="todayValue"></strong></div>
+              <div class="tk-compare-track"><div class="tk-bar tk-bar-today" id="todayBar"></div></div>
+            </div>
+            <div class="tk-compare-row" data-row="after" tabindex="0">
+              <div class="tk-compare-label"><span id="afterLabel">With the AI Data Plane&trade;</span><strong id="afterValue"></strong></div>
+              <div class="tk-compare-track"><div class="tk-bar tk-bar-after" id="afterBarLow"></div><div class="tk-bar-range" id="afterBarRange"></div></div>
+            </div>
+            <p class="tk-compare-foot" id="compareFoot"></p>
+            <div class="tk-tooltip" id="compareTip" role="tooltip" hidden></div>
           </div>
           <div class="result-card tk-gpu-only tk-hidden">
             <span>Dedicated GPU fleet, per year</span>
@@ -1108,6 +1143,8 @@ function render(){
     el.textContent = `${fmtRange(row.low, row.high, fmtUSD)}/yr on its own (${row.detail})`;
   });
 
+  renderCompare(gpu, ready, r, R, S, D);
+
   const bt = document.getElementById('breakdownTable');
   const leverRows = () => {
     let html = r.rows.map(row => `<tr><td>${row.lever.name} (${row.detail})</td><td>${fmtRange(row.low, row.high, fmtUSD)}/yr</td></tr>`).join('');
@@ -1142,6 +1179,49 @@ function render(){
     html += `<tr><td colspan="2"><span class="tk-breakdown-note">Based on ${fmtUSD(r.annual)}/yr in token spend (${fmtUSD(spend)}/mo). ${combineNote}</span></td></tr>`;
     bt.innerHTML = html;
   }
+}
+
+/* ===== Before/after bars: today's bill vs. the bill with the AI Data Plane =====
+   Token path: today = annual token spend; after = spend minus lever savings.
+   GPU path:   today = dedicated fleet; after = serverless bill minus lever savings.
+   Bars share one scale (the larger of the two), so the gap between them is the savings. */
+const compareData = { today: null, after: null };
+function renderCompare(gpu, ready, r, R, S, D){
+  const block = document.getElementById('compareBlock');
+  document.getElementById('compareTip').hidden = true;
+  block.querySelectorAll('.tk-compare-row.is-active').forEach(row => row.classList.remove('is-active'));
+  const show = ready && (gpu || r.n > 0);
+  block.classList.toggle('tk-hidden', !show);
+  if(!show) return;
+  const today = gpu ? R : r.annual;
+  const base = gpu ? S : r.annual;
+  const afterLo = Math.max(0, base - r.high), afterHi = Math.max(0, base - r.low);
+  const scale = Math.max(today, afterHi) || 1;
+  const pctW = v => `${(v / scale * 100).toFixed(2)}%`;
+
+  document.getElementById('todayLabel').textContent = gpu ? 'Today: dedicated GPUs' : 'Today';
+  document.getElementById('afterLabel').textContent = gpu ? 'Serverless, with the AI Data Plane™' : 'With the AI Data Plane™';
+  document.getElementById('todayValue').textContent = fmtUSD(today);
+  document.getElementById('afterValue').textContent = fmtRange(afterLo, afterHi, fmtUSD);
+  document.getElementById('todayBar').style.width = pctW(today);
+  const hasRange = Math.round(afterHi) !== Math.round(afterLo);
+  const lowBar = document.getElementById('afterBarLow'), rangeBar = document.getElementById('afterBarRange');
+  lowBar.style.width = pctW(afterLo);
+  lowBar.classList.toggle('tk-bar-joined', hasRange);
+  rangeBar.style.display = hasRange ? 'block' : 'none';
+  rangeBar.style.width = hasRange ? pctW(afterHi - afterLo) : '0';
+
+  const saveLo = today - afterHi, saveHi = today - afterLo;
+  const foot = document.getElementById('compareFoot');
+  if(saveHi <= 0){
+    foot.textContent = 'At this traffic, serverless costs more than the fleet.';
+  } else {
+    const lo = Math.max(0, saveLo) / today, hi = saveHi / today;
+    foot.textContent = `${lo > 0 ? '' : 'Up to '}${rateLabel({ low: lo > 0 ? lo : hi, high: hi })} less than ${gpu ? 'the fleet costs today' : 'you spend today'}.`;
+  }
+  compareData.today = { value: `${fmtUSD(today)}/yr`, note: gpu ? 'dedicated GPU fleet' : `${fmtUSD(today / 12)}/mo in token spend` };
+  compareData.after = { value: `${fmtRange(afterLo, afterHi, fmtUSD)}/yr`,
+    note: saveHi > 0 ? `saves ${fmtRange(Math.max(0, saveLo), saveHi, fmtUSD)} a year` : `costs ${fmtRange(-saveHi, -saveLo, fmtUSD)} more a year` };
 }
 
 function fmtUSD2(n){ return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -1262,6 +1342,36 @@ document.addEventListener('click', () => {
 });
 
 document.querySelectorAll('[data-as-of]').forEach(el => { el.textContent = AGENT_MEMORY_AS_OF; });
+
+(function wireCompareTooltip(){
+  const block = document.getElementById('compareBlock');
+  const tip = document.getElementById('compareTip');
+  const show = row => {
+    const d = compareData[row.dataset.row];
+    if(!d) return;
+    tip.textContent = '';
+    const v = document.createElement('strong'); v.textContent = d.value;
+    const l = document.createElement('span'); l.textContent = ` · ${d.note}`;
+    tip.append(v, l);
+    tip.hidden = false;
+    /* One line over the row's own bar, right edge at the bar's end, kept inside the card,
+       so it never covers the value labels above the bars. */
+    const b = block.getBoundingClientRect(), t = row.querySelector('.tk-compare-track').getBoundingClientRect();
+    const bars = [...row.querySelectorAll('.tk-bar, .tk-bar-range')].filter(el => el.offsetWidth > 0);
+    const end = Math.max(...bars.map(el => el.getBoundingClientRect().right)) - b.left;
+    const left = Math.min(Math.max(8, end - tip.offsetWidth), b.width - tip.offsetWidth - 8);
+    tip.style.left = `${Math.max(8, left)}px`;
+    tip.style.top = `${t.top - b.top + t.height / 2 - tip.offsetHeight / 2}px`;
+    row.classList.add('is-active');
+  };
+  const hide = row => { tip.hidden = true; row.classList.remove('is-active'); };
+  block.querySelectorAll('.tk-compare-row').forEach(row => {
+    row.addEventListener('pointerenter', () => show(row));
+    row.addEventListener('pointerleave', () => hide(row));
+    row.addEventListener('focus', () => show(row));
+    row.addEventListener('blur', () => hide(row));
+  });
+})();
 
 buildLeverGroups();
 buildRateTable();

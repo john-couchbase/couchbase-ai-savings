@@ -85,6 +85,15 @@ Use these to check a port. All of them use $20,000 per month ($240,000 per year)
 
 With all four on at defaults, the overlap row shows −$9,706 to −$24,204.
 
+**Before/after bars ("Your annual model bill").** These appear under the savings card once there's something to compare. "Today" is the annual token spend on the per-token path, or the fleet cost on the GPU path. "With the AI Data Plane" is that bill minus the savings, with the solid bar running to the low end and a lighter band out to the high end. Both bars share one scale, the larger of the two, so the gap between them shows the savings.
+
+| Scenario | Today | With the AI Data Plane | Caption |
+|---|---|---|---|
+| Per token, all four levers, defaults | $240,000 | $131,724 – $167,986 | 30–45% less than you spend today |
+| GPU path, no levers, defaults | $115,807 | $21,120 | 82% less than the fleet costs today |
+| GPU path, all four levers, defaults | $115,807 | $11,592 – $14,783 | 87–90% less than the fleet costs today |
+| GPU path, 10M requests/mo, no levers | $115,807 | $211,200 (longer bar) | At this traffic, serverless costs more than the fleet |
+
 **Dedicated GPU path.** Defaults: 2 instances × $6.61/hour (1-year reserved) × 730 hours; 1M requests a month at 2,000 in / 400 out tokens; Nova 2 Lite at $0.33 / $2.75.
 
 | Scenario | Fleet / yr | Serverless / yr | Expected total | Break-even |
