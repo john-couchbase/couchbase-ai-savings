@@ -66,9 +66,9 @@ break-even requests   = (dedicated ÷ 12) ÷ serverless cost per request
 
 Display rules:
 
-- If the high end of the total is 0 or less, show "No savings at this traffic" and the warning that the fleet costs less.
-- If only the low end is below 0, show "Up to $X".
-- The warning message appears whenever D ≤ 0, even if the levers close the gap.
+- If the high end of the total is 0 or less, the headline reads "No serverless savings at this traffic" and the sub-text gives the gap. The recommendation box for Capella Model Service provisioned GPUs appears, and the before/after caption points to it.
+- If only the low end is below 0, show "Up to $X". No recommendation box, because serverless with the levers can still win.
+- The break-even card shows the crossover before the levers. With levers on, a note adds the lever-adjusted crossover: break-even ÷ (1 − combined lever fraction), low and high.
 
 ### Test cases
 
@@ -102,7 +102,9 @@ With all four on at defaults, the overlap row shows −$9,706 to −$24,204.
 | All four levers, "Not sure yet" | $115,807 | $21,120 | $101,024 – $104,216 (levers $6,337 – $9,528) | 5.5M |
 | On-demand rate, no levers | $183,785 | $21,120 | $162,665 | 8.7M |
 | 3-year reserved rate, no levers | $79,366 | $21,120 | $58,246 | 3.8M |
-| 10M requests/mo, no levers | $115,807 | $211,200 | "No savings at this traffic" (serverless costs $95,393 more) | 5.5M |
+| 10M requests/mo, no levers | $115,807 | $211,200 | "No serverless savings at this traffic" (serverless costs $95,393 more), provisioned GPU box shown | 5.5M |
+| 10M requests/mo, all four levers | $115,807 | $211,200 | "No serverless savings at this traffic" (serverless costs $109 – $32,020 more even with levers), box shown | 5.5M; 7.8M–10M with levers |
+| 7M requests/mo, all four levers | $115,807 | $147,840 | $12,328 – $34,666, no box | 5.5M; 7.8M–10M with levers |
 
 ## Lead capture
 

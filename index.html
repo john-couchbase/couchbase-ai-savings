@@ -346,6 +346,13 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
 .tk-tooltip strong { color: #fff; font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) { .tk-bar, .tk-bar-range { transition: none; } }
 
+.tk-card-note { display: block; margin-top: 0.4rem; color: var(--muted); font-size: 0.78rem; font-weight: 600; line-height: 1.35; }
+
+/* ===== Recommendation when dedicated capacity costs less ===== */
+.tk-reco { display: grid; gap: 0.35rem; background: #f3f6fb; color: var(--ink); border: 1px solid #d6e0ef; font-weight: 500; font-size: 0.85rem; line-height: 1.45; }
+.tk-reco strong { font-size: 0.92rem; font-weight: 800; }
+.tk-reco a { color: var(--cb-red-dark); font-weight: 750; }
+
 /* ===== Step 1 payment mode ===== */
 .tk-mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
 @media (max-width: 640px) { .tk-mode-grid { grid-template-columns: 1fr; } }
@@ -617,11 +624,16 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
           <div class="result-card tk-gpu-only tk-hidden">
             <span>Serverless costs less up to</span>
             <strong id="breakEvenEcho">Not set</strong>
+            <small class="tk-card-note" id="breakEvenNote"></small>
           </div>
         </div>
 
         <div class="message warning tk-hidden" id="noSpendMsg">Enter your monthly spend in Step 1 to size these levers.</div>
-        <div class="message warning tk-hidden" id="gpuCheaperMsg">At this traffic, the GPU fleet costs less than serverless. Steady, high-volume workloads can favor dedicated capacity, and Capella Model Service offers provisioned GPUs for that case too.</div>
+        <div class="message tk-hidden tk-reco" id="gpuCheaperMsg">
+          <strong>The lower-cost AI Data Plane option at this traffic: provisioned GPUs</strong>
+          <span>At this volume, dedicated capacity costs less than paying per token. Capella Model Service offers that too: dedicated GPUs through NVIDIA NIM, billed by the node-hour. You keep a fixed, predictable fleet cost, and the levers in Step 2 still cut the tokens each request needs, so the same fleet can serve more traffic.</span>
+          <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Compare Model Service options</a>
+        </div>
 
         <button type="button" id="toggleBreakdown" class="tk-ghost-btn" style="margin-top:1rem;" aria-expanded="false" aria-controls="breakdownBox">How we calculate this &#9662;</button>
         <div class="summary-box" id="breakdownBox" style="display:none;">
@@ -949,7 +961,7 @@ function computeTotal(){
     rows.push(row);
   });
   const low = annual * (1 - keepLow), high = annual * (1 - keepHigh);
-  return { rows, low, high, overlapLow: sumLow - low, overlapHigh: sumHigh - high, n: rows.length, annual };
+  return { rows, low, high, lowFrac: 1 - keepLow, highFrac: 1 - keepHigh, overlapLow: sumLow - low, overlapHigh: sumHigh - high, n: rows.length, annual };
 }
 
 /* ============================================================
@@ -1074,7 +1086,7 @@ function breakEvenRequests(){
   return perReq > 0 ? fleetAnnual() / 12 / perReq : 0;
 }
 function fmtCount(n){
-  if(n >= 1e6) return `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)}M`;
+  if(n >= 1e6){ const m = n / 1e6; return m >= 9.95 ? `${Math.round(m)}M` : `${m.toFixed(1)}M`; }
   if(n >= 1e3) return `${Math.round(n / 1e3)}K`;
   return `${Math.round(n)}`;
 }
@@ -1094,10 +1106,16 @@ function render(){
   document.getElementById('serverlessEcho').textContent = S > 0 ? fmtUSD(S) : 'Not set';
   const be = breakEvenRequests();
   document.getElementById('breakEvenEcho').textContent = be > 0 ? `${fmtCount(be)} requests/mo` : 'Not set';
+  /* With levers on, each request costs less on serverless, so the crossover moves out. */
+  const beLo = be / (1 - r.lowFrac), beHi = be / (1 - r.highFrac);
+  document.getElementById('breakEvenNote').textContent = (be > 0 && r.n > 0)
+    ? `Before the levers. With them on: ${fmtCount(beLo) === fmtCount(beHi) ? fmtCount(beLo) : `${fmtCount(beLo)}–${fmtCount(beHi)}`}`
+    : '';
   const noSpend = document.getElementById('noSpendMsg');
   noSpend.textContent = gpu ? 'Enter your GPU fleet and traffic in Step 1 to compare.' : 'Enter your monthly spend in Step 1 to size these levers.';
   noSpend.classList.toggle('tk-hidden', ready);
-  document.getElementById('gpuCheaperMsg').classList.toggle('tk-hidden', !(gpu && ready && D <= 0));
+  /* Recommend provisioned GPUs only when the fleet stays cheaper even at the best lever case. */
+  document.getElementById('gpuCheaperMsg').classList.toggle('tk-hidden', !(gpu && ready && D + r.high <= 0));
   document.getElementById('leversCount').textContent = `${r.n} of ${LEVERS.length}`;
   document.getElementById('savingsLabel').textContent = gpu ? 'Estimated annual savings' : 'Estimated annual token savings';
 
@@ -1111,15 +1129,17 @@ function render(){
     } else {
       const lo = D + r.low, hi = D + r.high;
       if(hi <= 0){
-        savingsEl.textContent = 'No savings at this traffic';
+        savingsEl.textContent = 'No serverless savings at this traffic';
       } else if(lo < 0){
         savingsEl.textContent = `Up to ${fmtUSD(hi)}`;
       } else {
         savingsEl.textContent = fmtRange(lo, hi, fmtUSD);
       }
-      savingsPctEl.textContent = D > 0
-        ? `per year: ${fmtUSD(D)} from moving this traffic to serverless${r.n ? `, plus ${leverPart} from the levers below` : ''}.`
-        : `per year. Before the levers, serverless costs ${fmtUSD(-D)} more than the fleet for this traffic${r.n ? `, and the levers below save ${leverPart} on the serverless bill` : ''}.`;
+      savingsPctEl.textContent = hi <= 0
+        ? `Serverless would cost ${fmtRange(-hi, -lo, fmtUSD)} more a year than your fleet${r.n ? ', even with the levers' : ''}. Dedicated capacity is the better fit here, and Capella Model Service offers it as provisioned GPUs (details below).`
+        : D > 0
+          ? `per year: ${fmtUSD(D)} from moving this traffic to serverless${r.n ? `, plus ${leverPart} from the levers below` : ''}.`
+          : `per year. Before the levers, serverless costs ${fmtUSD(-D)} more than the fleet for this traffic${r.n ? `, and the levers below save ${leverPart} on the serverless bill` : ''}.`;
     }
   } else if(r.n === 0 || !ready){
     savingsEl.textContent = 'Turn on a lever to see an estimate';
@@ -1214,7 +1234,7 @@ function renderCompare(gpu, ready, r, R, S, D){
   const saveLo = today - afterHi, saveHi = today - afterLo;
   const foot = document.getElementById('compareFoot');
   if(saveHi <= 0){
-    foot.textContent = 'At this traffic, serverless costs more than the fleet.';
+    foot.textContent = 'At this traffic, dedicated GPUs cost less than serverless. Capella Model Service offers both, so see the provisioned GPU option below.';
   } else {
     const lo = Math.max(0, saveLo) / today, hi = saveHi / today;
     foot.textContent = `${lo > 0 ? '' : 'Up to '}${rateLabel({ low: lo > 0 ? lo : hi, high: hi })} less than ${gpu ? 'the fleet costs today' : 'you spend today'}.`;
