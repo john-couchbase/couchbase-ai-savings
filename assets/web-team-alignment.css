@@ -378,16 +378,16 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
 @media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
 
-/* Black navigation and calculator frame; beige is reserved for the hero. */
+/* Black canvas with quiet charcoal panels; beige is reserved for the hero. */
 :root[data-theme=dark] {
  --page:#000;--surface:#202020;--subtle:#333;--selected:#49332f;
- --ink:#fff;--muted:#d6d6d6;--line:#ec1218;--control-line:#888;
+ --ink:#f5f5f5;--muted:#c5c5c5;--line:#393939;--control-line:#777;
  --link:#ffc1b5;--cb-red-dark:#ffc1b5;
 }
 :root[data-theme=dark] .hero { background:#000;border-bottom:0; }
 :root[data-theme=dark] .intro.brand-intro { background:#fff0da;margin-top:28px;padding:48px 32px;border-radius:16px; }
 :root[data-theme=dark] .custom-art { right:24px; }
-:root[data-theme=dark] .brand-row { background:#000;border:1px solid var(--cb-red); }
+:root[data-theme=dark] .brand-row { background:#171717;border:1px solid #393939; }
 :root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo-dark.svg'); }
 :root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:#fff; }
 :root[data-theme=dark] .brand-intro .subhead { color:#655747; }
@@ -396,11 +396,11 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root[data-theme=dark] .step-nav button { color:var(--muted); }
 :root[data-theme=dark] .step-nav button[aria-current] { color:var(--ink); }
 :root[data-theme=dark] .step-nav button:disabled { color:#d0c2b0;opacity:.65; }
-/* Locally scoped tokens keep text and controls coherent on the cream panels. */
+/* Panel-local tokens separate controls without stark white blocks. */
 :root[data-theme=dark] :is(.input-section,.tk-mode-grid .check-card,.tool-group,.review-inputs,.inline-methodology,.gpu-assumptions,.comparison-details,#settingsDialog,#gpuInputs>.input-stack>.field,#step3 .tk-compare-row,#step3 .hero-card) {
- --surface:#fff;--subtle:#f5f5f5;--selected:#fff0f0;--ink:#181818;--muted:#555;
- --line:#ec1218;--control-line:#999;--link:#ad171b;--cb-red-dark:#ad171b;
- color:var(--ink);background:var(--surface);border-color:var(--line);color-scheme:light;
+ --surface:#242424;--subtle:#303030;--selected:#3b3b3b;--ink:#f5f5f5;--muted:#c5c5c5;
+ --line:#444;--control-line:#777;--link:#f1b9b6;--cb-red-dark:#f1b9b6;
+ color:var(--ink);background:var(--surface);border-color:var(--line);color-scheme:dark;
 }
 :root[data-theme=dark] input[type=number],:root[data-theme=dark] .select-trigger { background:var(--subtle);color:var(--ink);border-color:var(--control-line);box-shadow:none; }
 :root[data-theme=dark] .choice-option,:root[data-theme=dark] .tk-lever-controls .archetype-grid label { background:var(--subtle);color:var(--ink); }
@@ -410,6 +410,11 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root[data-theme=dark] #step3 .hero-card { background:var(--surface);border-color:var(--line); }
 :root[data-theme=dark] .footer-social a:hover { background:var(--subtle);color:var(--ink); }
 
-:root[data-theme=dark] .review-inputs dl>div,:root[data-theme=dark] .inline-methodology details,:root[data-theme=dark] .gpu-assumptions>.field { border-bottom-color:#dedede;border-top-color:#dedede; }
-:root[data-theme=dark] .site-footer { border-color:var(--cb-red); }
+:root[data-theme=dark] .review-inputs dl>div,:root[data-theme=dark] .inline-methodology details,:root[data-theme=dark] .gpu-assumptions>.field { border-bottom-color:#444;border-top-color:#444; }
+:root[data-theme=dark] .site-footer { border-color:#393939; }
 @media(max-width:760px){:root[data-theme=dark] .intro.brand-intro{padding:32px 20px;}:root[data-theme=dark] .custom-art{right:auto;}}
+
+/* Selection uses a lighter neutral surface; no red card outlines. */
+:root[data-theme=dark] .choice-option:has(input:checked),:root[data-theme=dark] .tk-lever-controls .archetype-grid label:has(input:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { background:var(--selected);border-color:#999; }
+:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked) { border-color:#777; }
+:root[data-theme=dark] .preset-row button[aria-pressed=true],:root[data-theme=dark] .share-presets button[aria-pressed=true],:root[data-theme=dark] #gpuInputs>.button-row button[aria-pressed=true] { border-color:#999; }
