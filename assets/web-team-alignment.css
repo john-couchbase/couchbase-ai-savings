@@ -251,3 +251,49 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 @keyframes menu-reveal { from { opacity:0;transform:translateY(-3px); } to { opacity:1;transform:translateY(0); } }
 @media(prefers-reduced-motion:reduce){.select-menu:popover-open{animation:none;}}
 @media(max-width:540px){.inline-methodology{padding:20px;}.inline-methodology h2{font-size:22px;}.inline-methodology summary{font-size:16px;}}
+
+/* Reference-led controls: visible options and an honest input summary. */
+.card-select::after { display:none; }
+.card-select select[hidden] { display:none!important; }
+.choice-picker { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+.choice-option { display:flex!important;align-items:center;gap:12px;padding:16px!important;margin:0;min-height:68px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-size:15px!important;font-weight:500!important;line-height:1.35;cursor:pointer; }
+.choice-option input[type=radio] { appearance:auto;width:22px;height:22px;flex:0 0 22px;margin:0;accent-color:var(--cb-red); }
+.choice-option:has(input:checked) { background:var(--selected);border-color:var(--cb-red); }
+.choice-option:has(input:focus-visible) { outline:2px solid var(--link);outline-offset:3px; }
+#gpuInputs { background:transparent!important;border:0;padding:0; }
+#gpuInputs>.input-stack { grid-template-columns:minmax(0,1fr);gap:20px; }
+#gpuInputs>.input-stack>.field { padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface);display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:20px;align-items:center; }
+#gpuInputs>.input-stack>.field:has(.card-select) { grid-template-columns:1fr;gap:16px; }
+#gpuInputs>.tk-subhead { font-size:22px;margin:28px 0 16px; }
+#gpuInputs>.tk-subhead:first-child { margin-top:0; }
+#gpuInputs>.button-row { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 0; }
+#gpuInputs>.button-row button { min-width:0;padding:10px 6px; }
+.gpu-assumptions { background:var(--surface);margin-top:24px;border:1px solid var(--line);border-radius:16px; }
+.gpu-assumptions>summary { min-height:64px;background:var(--surface)!important;font-family:'Centra No2',Inter,sans-serif;font-size:18px;padding:20px 48px 20px 22px; }
+.gpu-assumptions[open]>summary { color:var(--link)!important;border-bottom:1px solid var(--line); }
+#gpuInputs .gpu-assumptions>.field { display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:20px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:12px; }
+.gpu-assumptions>.input-stack { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.gpu-assumptions .field:has(.card-select) { grid-column:1/-1; }
+#calculator .review-inputs { display:block;grid-column:2;grid-row:1/span 5;margin:0;padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--surface); }
+.review-inputs h2 { font-size:25px;margin:0 0 8px; }
+.review-inputs>p { font-size:14px;margin:0;color:var(--muted); }
+.review-inputs dl { margin:8px 0 0; }
+.review-inputs dl>div { padding:20px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;margin:0; }
+.review-inputs dl>div:last-child { border-bottom:0;padding-bottom:0; }
+.review-inputs dt { font-size:13px;margin-bottom:6px; }
+.review-inputs dd { font-size:18px;line-height:1.5; }
+.review-inputs .review-actions { display:none; }
+#calculator:has(#step3:not([hidden])) .review-inputs { grid-column:1;grid-row:3;padding:24px; }
+#calculator:has(#step3:not([hidden])) .review-actions { display:flex;margin-top:24px; }
+.inline-methodology { margin-top:28px; }
+.inline-methodology summary { padding:20px 40px 20px 0; }
+@media(max-width:1100px){
+ #calculator .review-inputs { order:3;margin-top:28px; }
+ #calculator:not(:has(#step3:not([hidden]))) .review-inputs { display:none; }
+}
+@media(max-width:540px){
+ #gpuInputs>.input-stack>.field,#gpuInputs .gpu-assumptions>.field { grid-template-columns:minmax(0,1fr);gap:12px; }
+ .choice-picker { gap:8px; }.choice-option { padding:14px 10px!important;font-size:14px!important;gap:8px;min-height:64px; }
+ .gpu-assumptions>.input-stack { grid-template-columns:1fr; }
+ #gpuInputs>.button-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}

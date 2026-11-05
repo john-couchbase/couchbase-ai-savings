@@ -1093,7 +1093,7 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
  #step3 .tk-compare-label{gap:4px;}
 }
 </style>
-<link rel="stylesheet" href="assets/web-team-alignment.css?v=4">
+<link rel="stylesheet" href="assets/web-team-alignment.css?v=5">
 </head>
 <body>
 <div class="ambient-scene" aria-hidden="true"><div class="ambient-orbit"><i></i><i></i><i></i></div></div>
@@ -1361,8 +1361,7 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
     </aside>
 
       </section>
-      <aside class="estimate-placeholder" aria-labelledby="placeholderTitle"><h2 id="placeholderTitle">Your annual impact</h2><div class="pending-estimate"><span>Potential yearly savings</span><strong>Complete your estimate</strong><p>Review your spend and workload to see your results.</p></div><div class="sidebar-method"><h3>What goes into the estimate</h3><p>Your current bill, the work your app does, and the reductions you select.</p><a href="methodology.html" target="_blank" rel="noopener">Methodology &amp; sources</a></div></aside>
-      <section class="review-inputs" aria-labelledby="reviewInputsTitle"><h2 id="reviewInputsTitle">Your estimate at a glance</h2><p>Review your inputs or adjust them to explore another scenario.</p><dl><div><dt>Current annual cost</dt><dd id="reviewAnnual"></dd></div><div><dt>Selected workload</dt><dd id="reviewPatterns"></dd></div><div><dt>Cost basis</dt><dd id="reviewBasis"></dd></div></dl><div class="review-actions"><button type="button" class="back-action" data-go-step="1">Edit spend</button><button type="button" class="back-action" data-go-step="2">Edit workload</button></div></section>
+      <section class="review-inputs" aria-labelledby="reviewInputsTitle"><h2 id="reviewInputsTitle">Your inputs</h2><p>Your current setup, used for the estimate.</p><dl><div><dt>Current annual cost</dt><dd id="reviewAnnual"></dd></div><div><dt>Selected workload</dt><dd id="reviewPatterns"></dd></div><div><dt>Cost basis</dt><dd id="reviewBasis"></dd></div></dl><div class="review-actions"><button type="button" class="back-action" data-go-step="1">Edit spend</button><button type="button" class="back-action" data-go-step="2">Edit workload</button></div></section>
       <section class="inline-methodology" aria-labelledby="inlineMethodTitle"><h2 id="inlineMethodTitle">Methodology &amp; assumptions</h2><details><summary>How savings are calculated</summary><p>Caching reduces repeat model calls. Memory, retrieval, and tool search reduce input tokens. Reductions are combined rather than added.</p></details><details><summary>What the estimate includes</summary><p>Model costs only. Couchbase, implementation, and any existing GPU commitments must be considered separately.</p></details><details><summary>Where the assumptions come from</summary><p>Defaults draw on published research and product benchmarks. Replace them with measurements from your own workload when available.</p><a href="methodology.html" target="_blank" rel="noopener">View all methodology and sources</a></details></section>
     </main>
   </div>
@@ -1764,8 +1763,8 @@ function render(){
   document.querySelectorAll('.tk-token-only').forEach(el => el.classList.toggle('tk-hidden', gpu));
   document.getElementById('spendEcho').textContent = fmtUSD(r.annual);
   document.getElementById('fleetEcho').textContent = fmtUSD(R);
-  document.getElementById('reviewAnnual').textContent = fmtUSD(gpu ? R : r.annual);
-  document.getElementById('reviewPatterns').textContent = LEVERS.filter(l=>state.enabled.has(l.id)).map(l=>l.shortName).join(', ') || 'None selected';
+  document.getElementById('reviewAnnual').textContent = ready ? fmtUSD(gpu ? R : r.annual) : '—';
+  document.getElementById('reviewPatterns').textContent = LEVERS.filter(l=>state.enabled.has(l.id)).map(l=>l.shortName).join(', ') || 'Not selected yet.';
   document.getElementById('reviewBasis').textContent = gpu ? 'Dedicated GPUs compared with serverless' : 'Current model-provider bill';
   document.getElementById('serverlessEcho').textContent = fmtUSD(S);
   const be = breakEvenRequests();
@@ -2186,47 +2185,24 @@ document.getElementById('closeSettings').addEventListener('click',()=>{if(valida
 settingsDialog.addEventListener('cancel',event=>{if(!validateInputs(true))event.preventDefault();});
 
 function syncSelectMenus(){
- document.querySelectorAll('.select-trigger').forEach(button=>{
-  const select=document.getElementById(button.dataset.select);
-  button.querySelector('.select-value').textContent=select.selectedOptions[0]?.textContent||'';
-  document.querySelectorAll(`#${select.id}-menu [role=option]`).forEach(option=>option.setAttribute('aria-selected',String(option.dataset.value===select.value)));
+ document.querySelectorAll('.choice-picker input[type=radio]').forEach(input=>{
+  input.checked=document.getElementById(input.dataset.select).value===input.value;
  });
 }
 function buildSelectMenus(){
  document.querySelectorAll('.select-control select').forEach(select=>{
-  const wrapper=select.parentElement;
   const label=document.querySelector(`label[for="${select.id}"]`);
-  const trigger=document.createElement('button');
-  trigger.type='button';trigger.id=select.id+'-trigger';trigger.className='select-trigger';trigger.dataset.select=select.id;
-  trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-controls',select.id+'-menu');
-  trigger.innerHTML='<span class="select-value"></span><span class="select-chevron" aria-hidden="true"></span>';
-  label.id=select.id+'-label';label.htmlFor=trigger.id;trigger.setAttribute('aria-labelledby',label.id+' '+trigger.id);
-  const menu=document.createElement('div');menu.id=select.id+'-menu';menu.className='select-menu';menu.setAttribute('popover','auto');menu.setAttribute('role','listbox');menu.setAttribute('aria-labelledby',label.id);
+  label.id=select.id+'-label';label.removeAttribute('for');
+  const group=document.createElement('div');group.className='choice-picker';
+  group.setAttribute('role','radiogroup');group.setAttribute('aria-labelledby',label.id);
   [...select.options].forEach(item=>{
-   const option=document.createElement('button');option.type='button';option.setAttribute('role','option');option.dataset.value=item.value;option.textContent=item.textContent;option.tabIndex=-1;
-   option.addEventListener('click',()=>{select.value=item.value;select.dispatchEvent(new Event('change',{bubbles:true}));syncSelectMenus();menu.hidePopover();trigger.focus();});
-   menu.append(option);
+   const option=document.createElement('label');option.className='choice-option';
+   const input=document.createElement('input');input.type='radio';input.name=select.id+'-choice';input.value=item.value;input.dataset.select=select.id;
+   const text=document.createElement('span');text.textContent=item.textContent;
+   option.append(input,text);group.append(option);
+   input.addEventListener('change',()=>{if(input.checked){select.value=input.value;select.dispatchEvent(new Event('change',{bubbles:true}));}});
   });
-  wrapper.append(trigger,menu);select.hidden=true;wrapper.classList.add('enhanced-select');
-  function position(){
-   const r=trigger.getBoundingClientRect(),height=menu.offsetHeight;
-   menu.style.width=r.width+'px';menu.style.left=Math.max(8,Math.min(r.left,innerWidth-r.width-8))+'px';
-   menu.style.top=(r.bottom+height+8>innerHeight && r.top>height+8 ? r.top-height-6 : r.bottom+6)+'px';
-   menu.style.maxHeight=Math.max(120,innerHeight-24)+'px';
-  }
-  function open(){menu.showPopover();position();trigger.setAttribute('aria-expanded','true');const options=[...menu.children];(options.find(o=>o.dataset.value===select.value)||options[0]).focus();}
-  trigger.addEventListener('click',()=>menu.matches(':popover-open')?menu.hidePopover():open());
-  trigger.addEventListener('keydown',event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();open();}});
-  menu.addEventListener('keydown',event=>{
-   const options=[...menu.children],index=options.indexOf(document.activeElement);
-   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;options[next].focus();}
-   if(event.key==='Escape'){event.preventDefault();menu.hidePopover();trigger.focus();}
-   if(event.key==='Tab'){menu.hidePopover();trigger.focus();}
-   if(event.key.length===1 && /[a-z]/i.test(event.key)){const match=options.find(o=>o.textContent.toLowerCase().startsWith(event.key.toLowerCase()));if(match)match.focus();}
-  });
-  menu.addEventListener('toggle',()=>trigger.setAttribute('aria-expanded',String(menu.matches(':popover-open'))));
-  window.addEventListener('resize',()=>{if(menu.matches(':popover-open'))menu.hidePopover();});
-  window.addEventListener('scroll',()=>{if(menu.matches(':popover-open'))menu.hidePopover();},{passive:true});
+  select.hidden=true;select.parentElement.classList.add('card-select');select.parentElement.append(group);
  });
  syncSelectMenus();
 }
