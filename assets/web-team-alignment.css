@@ -377,3 +377,28 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .footer-social a:hover { color:var(--link);background:var(--selected); }
 .footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
 @media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
+
+/* Dark mode uses a slate canvas and lighter working surfaces. */
+:root[data-theme=dark] {
+ --page:#273440;--surface:#354654;--subtle:#435867;--selected:#59434b;
+ --ink:#f8f5ee;--muted:#d1dbe1;--line:#637684;--control-line:#91a3af;
+ --link:#ffbbb7;--cb-red-dark:#ffbbb7;
+}
+:root[data-theme=dark] .hero { background:#30424e;border-bottom:1px solid var(--line); }
+:root[data-theme=dark] .brand-row { background:#354654;border:1px solid #637684; }
+:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo-dark.svg'); }
+:root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:var(--ink); }
+:root[data-theme=dark] .brand-intro .subhead { color:var(--muted); }
+:root[data-theme=dark] .step-nav button { color:var(--muted); }
+:root[data-theme=dark] .step-nav button[aria-current] { color:var(--ink); }
+:root[data-theme=dark] .step-nav button:disabled { color:#b0bec8;opacity:.65; }
+:root[data-theme=dark] input[type=number],:root[data-theme=dark] .select-trigger { background:var(--subtle);color:var(--ink);border-color:var(--control-line);box-shadow:none; }
+
+:root[data-theme=dark] .choice-option,:root[data-theme=dark] .tk-lever-controls .archetype-grid label { background:var(--subtle); }
+:root[data-theme=dark] .choice-option:has(input:checked),:root[data-theme=dark] .tk-lever-controls .archetype-grid label:has(input:checked) { background:var(--selected);border-color:#ffaaa4; }
+:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { border-color:#ffaaa4; }
+:root[data-theme=dark] .comparison-details,:root[data-theme=dark] .gpu-assumptions,:root[data-theme=dark] #settingsDialog { color:var(--ink);background:var(--surface); }
+:root[data-theme=dark] #settingsDialog .sources-panel { background:transparent; }
+:root[data-theme=dark] #step3 .hero-card { background:#435867;border-color:#91a3af; }
+:root[data-theme=dark] .footer-social a:hover { background:var(--subtle);color:var(--ink); }
+:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { background:var(--surface); }
