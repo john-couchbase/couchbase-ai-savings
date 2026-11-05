@@ -230,3 +230,24 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
  .pending-estimate { display:block; }.pending-estimate span{margin-bottom:10px}.pending-estimate p{margin-top:10px}
  #step3 .tk-compare-label strong{font-size:20px}.calculator-intro h2,#step3 h2{font-size:27px}
 }
+
+/* Keep reference content with the inputs; restore the earlier quiet menus. */
+.inline-methodology { grid-column:1;max-width:none;justify-self:stretch;margin:32px 0 0;padding:24px;border-radius:14px; }
+.inline-methodology h2 { text-align:left;font-size:24px;margin:0 0 16px; }
+.inline-methodology summary { text-align:left;padding:18px 40px 18px 0;min-height:60px;font-size:17px; }
+.inline-methodology summary::after { right:4px; }
+.inline-methodology details p { max-width:none;margin:0;padding:0 24px 20px 0;line-height:1.65; }
+.inline-methodology details>a { text-align:left;margin:0 0 20px; }
+.select-control .select-trigger { justify-content:center;text-align:center;padding:13px 44px;min-height:50px;border-radius:8px;font-size:15px;box-shadow:none; }
+.select-trigger[aria-expanded=true] { outline:none;border-color:var(--control-line);box-shadow:0 0 0 3px color-mix(in srgb,var(--control-line) 14%,transparent); }
+.select-trigger:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
+.select-menu { padding:6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 10px 28px #00000018; }
+.select-menu:popover-open { display:grid;gap:4px;animation:menu-reveal 140ms ease-out; }
+.select-menu button { padding:12px 16px;min-height:46px;border:0;border-radius:7px;background:transparent;box-shadow:none;text-align:left;font-size:15px;font-weight:400; }
+.select-menu button[aria-selected=true] { background:var(--selected);color:var(--ink);font-weight:600;box-shadow:none; }
+.select-menu button:hover,.select-menu button:focus { outline:none;border:0;box-shadow:none;background:var(--subtle);color:var(--ink); }
+.select-menu button[aria-selected=true]:focus { background:var(--selected); }
+.select-menu button:focus-visible { outline:1px solid var(--control-line);outline-offset:-1px; }
+@keyframes menu-reveal { from { opacity:0;transform:translateY(-3px); } to { opacity:1;transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce){.select-menu:popover-open{animation:none;}}
+@media(max-width:540px){.inline-methodology{padding:20px;}.inline-methodology h2{font-size:22px;}.inline-methodology summary{font-size:16px;}}
