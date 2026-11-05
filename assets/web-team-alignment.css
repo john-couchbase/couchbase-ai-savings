@@ -378,27 +378,30 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
 @media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
 
-/* Dark mode uses a neutral graphite canvas and lighter working surfaces. */
+/* Couchbase palette: charcoal canvas, cream working panels, red actions. */
 :root[data-theme=dark] {
- --page:#303030;--surface:#424242;--subtle:#535353;--selected:#505050;
- --ink:#fafafa;--muted:#dedede;--line:#707070;--control-line:#a6a6a6;
- --link:#ffbbb7;--cb-red-dark:#ffbbb7;
+ --page:#292622;--surface:#37322c;--subtle:#494139;--selected:#594238;
+ --ink:#fff8eb;--muted:#e0d5c5;--line:#746858;--control-line:#b4a58e;
+ --link:#ffc1b5;--cb-red-dark:#ffc1b5;
 }
-:root[data-theme=dark] .hero { background:#383838;border-bottom:1px solid var(--line); }
-:root[data-theme=dark] .brand-row { background:#424242;border:1px solid #707070; }
-:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo-dark.svg'); }
-:root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:var(--ink); }
+:root[data-theme=dark] .hero { background:#292622;border-bottom:1px solid var(--line); }
+:root[data-theme=dark] .brand-row { background:#fff0da;border:0; }
+:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo.svg'); }
+:root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:#24211d; }
 :root[data-theme=dark] .brand-intro .subhead { color:var(--muted); }
 :root[data-theme=dark] .step-nav button { color:var(--muted); }
 :root[data-theme=dark] .step-nav button[aria-current] { color:var(--ink); }
-:root[data-theme=dark] .step-nav button:disabled { color:#c0c0c0;opacity:.65; }
+:root[data-theme=dark] .step-nav button:disabled { color:#d0c2b0;opacity:.65; }
+/* Locally scoped tokens keep text and controls coherent on the cream panels. */
+:root[data-theme=dark] :is(.input-section,.tk-mode-grid .check-card,.tool-group,.review-inputs,.inline-methodology,.gpu-assumptions,.comparison-details,#settingsDialog,#gpuInputs>.input-stack>.field,#step3 .tk-compare-row,#step3 .hero-card) {
+ --surface:#fff0da;--subtle:#fff9ee;--selected:#fbe0c2;--ink:#29231d;--muted:#655747;
+ --line:#ddc7a7;--control-line:#96816a;--link:#ad171b;--cb-red-dark:#ad171b;
+ color:var(--ink);background:var(--surface);border-color:var(--line);color-scheme:light;
+}
 :root[data-theme=dark] input[type=number],:root[data-theme=dark] .select-trigger { background:var(--subtle);color:var(--ink);border-color:var(--control-line);box-shadow:none; }
-
-:root[data-theme=dark] .choice-option,:root[data-theme=dark] .tk-lever-controls .archetype-grid label { background:var(--subtle); }
-:root[data-theme=dark] .choice-option:has(input:checked),:root[data-theme=dark] .tk-lever-controls .archetype-grid label:has(input:checked) { background:var(--selected);border-color:#ffaaa4; }
-:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { border-color:#ffaaa4; }
-:root[data-theme=dark] .comparison-details,:root[data-theme=dark] .gpu-assumptions,:root[data-theme=dark] #settingsDialog { color:var(--ink);background:var(--surface); }
+:root[data-theme=dark] .choice-option,:root[data-theme=dark] .tk-lever-controls .archetype-grid label { background:var(--subtle);color:var(--ink); }
+:root[data-theme=dark] .choice-option:has(input:checked),:root[data-theme=dark] .tk-lever-controls .archetype-grid label:has(input:checked) { background:var(--selected);border-color:var(--cb-red); }
+:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { background:var(--surface);border-color:var(--cb-red); }
 :root[data-theme=dark] #settingsDialog .sources-panel { background:transparent; }
-:root[data-theme=dark] #step3 .hero-card { background:#535353;border-color:#a6a6a6; }
+:root[data-theme=dark] #step3 .hero-card { background:var(--surface);border-color:var(--line); }
 :root[data-theme=dark] .footer-social a:hover { background:var(--subtle);color:var(--ink); }
-:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked),:root[data-theme=dark] .tk-mode-grid .check-card:has(input:checked) { background:var(--surface); }
