@@ -297,3 +297,67 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
  .gpu-assumptions>.input-stack { grid-template-columns:1fr; }
  #gpuInputs>.button-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+/* Audited surface hierarchy: page / card / control, with a single accent. */
+:root { --radius-card:16px;--radius-control:10px; }
+:root[data-theme=dark] { --page:#18191b;--surface:#232527;--subtle:#2e3033;--selected:#382a2a;--ink:#f5f3ef;--muted:#c4c2bd;--line:#454749;--control-line:#717373;--link:#ffaaa4; }
+:root body { background:var(--page);color:var(--ink); }
+:root:not([data-theme=dark]) { --page:#fff;--selected:#fff5eb; }
+:root main,:root:not([data-theme=dark]) main { grid-template-columns:minmax(0,1.25fr) minmax(380px,1fr);column-gap:48px; }
+#calculator:has(#step3:not([hidden])) .step-nav { grid-column:1/-1;grid-row:1; }
+#step3:not([hidden]) { grid-row:2/span 3; }
+#calculator:has(#step3:not([hidden])) .review-inputs { grid-row:2; }
+#calculator:has(#step3:not([hidden])) .inline-methodology { grid-row:3; }
+:root .input-section,:root .tool-group,:root .tk-mode-grid .check-card { background:var(--surface);border:1px solid var(--line);box-shadow:none; }
+:root .input-section h3 { background:transparent;border:0;color:var(--ink); }
+:root .tool-group:has(input[type=checkbox]:checked),:root .tk-mode-grid .check-card:has(input:checked) { background:var(--surface);border-color:var(--cb-red); }
+:root .choice-option:has(input:checked),:root .archetype-grid label:has(input:checked) { background:var(--selected);border-color:var(--cb-red); }
+:root .preset-row button,:root .share-presets button,#gpuInputs>.button-row button { background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:none; }
+:root .preset-row button[aria-pressed=true],:root .share-presets button[aria-pressed=true],#gpuInputs>.button-row button[aria-pressed=true] { background:var(--selected);border-color:var(--cb-red);color:var(--ink); }
+/* The result is three separate units, matching the reference's visual rhythm. */
+:root #step3 .results-panel,:root #step3 .panel { background:transparent;border:0;box-shadow:none;padding:0; }
+#step3 .result-grid { background:transparent;border:0;overflow:visible;gap:20px; }
+#step3 .result-card.primary { border:0;border-radius:var(--radius-card);background:#d92e27;padding:24px;box-shadow:none; }
+#step3 .result-card.primary strong { font-size:clamp(24px,2.2vw,32px);font-weight:500;line-height:1.35; }
+#step3 #compareBlock:not(.tk-hidden) { padding:0;background:transparent;border:0;border-radius:0;gap:16px; }
+#step3 .tk-compare-row,#step3 .tk-compare-row+.tk-compare-row { padding:20px 16px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);text-align:left; }
+#step3 .tk-compare-label { align-items:flex-start;gap:14px;text-align:left;color:var(--muted); }
+#step3 .tk-compare-label strong { color:var(--ink);font-size:20px;line-height:1.4;font-variant-numeric:tabular-nums; }
+#step3 .estimate-note { padding:0;margin:18px 0;color:var(--muted);font-size:14px;line-height:1.6;background:transparent; }
+#step3 .estimate-edits { justify-content:flex-start;margin:16px 0 24px; }
+:root #step3 .hero-card { background:var(--surface);border:1px solid var(--line);padding:24px;box-shadow:none; }
+:root #step3 .hero-card .next-step-copy p { color:var(--ink)!important;font-size:20px;font-weight:500; }
+/* One disclosure style, including the expanded body. */
+:root .gpu-assumptions,:root .comparison-details,:root .inline-methodology { background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);overflow:hidden;box-shadow:none; }
+:root .gpu-assumptions { padding:0 24px 24px; }
+:root .gpu-assumptions:not([open]) { padding-bottom:0; }
+:root .gpu-assumptions>summary,:root .comparison-details>summary { background:transparent!important;color:var(--ink)!important;padding:22px 32px 22px 0;min-height:64px;font-size:17px;font-weight:500;border:0;list-style:none;position:relative; }
+:root .gpu-assumptions[open]>summary,:root .comparison-details[open]>summary { color:var(--link)!important;border-bottom:1px solid var(--line);margin-bottom:20px; }
+:root .comparison-details { padding:0 24px; }
+:root .comparison-details[open] { padding-bottom:24px; }
+.comparison-details>summary::-webkit-details-marker { display:none; }
+.comparison-details>summary::after { content:'';position:absolute;right:4px;top:27px;width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform 180ms; }
+.comparison-details[open]>summary::after { transform:rotate(225deg); }
+#gpuInputs .gpu-assumptions>.field { border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 0;background:transparent; }
+.gpu-assumptions .field { background:transparent; }
+.comparison-details .metric-grid { display:block; }
+.comparison-details .result-card { background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 0;box-shadow:none; }
+.comparison-details .result-card:last-child { border-bottom:0; }
+:root .inline-methodology summary:hover { background:transparent;color:var(--link); }
+:root .inline-methodology details[open] summary { background:transparent;color:var(--link); }
+:root ::selection { background:var(--selected);color:var(--ink); }
+@media(max-width:1100px){:root main,:root:not([data-theme=dark]) main{display:flex;} #step3:not([hidden]){order:2;}}
+@media(max-width:540px){
+ #step3 #compareBlock:not(.tk-hidden){grid-template-columns:1fr;gap:12px;}
+ #step3 .tk-compare-label{flex-direction:row;align-items:center;justify-content:space-between;gap:16px;}
+ #step3 .tk-compare-label strong{font-size:18px;text-align:right;max-width:60%;}
+ :root .gpu-assumptions,:root .comparison-details{padding-inline:18px;}
+ #step3 .result-card.primary{padding:22px;}
+}
+#step3 #compareBlock:not(.tk-hidden) { margin-top:20px; }
+:root .gpu-assumptions>summary,:root .comparison-details>summary { display:block;width:100%;box-sizing:border-box;text-align:left; }
+:root .gpu-assumptions>summary::after { right:4px; }
+#gpuInputs .gpu-assumptions>.field { margin:0; }
+.gpu-assumptions>.input-stack { padding:0; }
+.gpu-assumptions>.tk-subhead { margin:24px 0 16px; }
+:root:not([data-theme=dark]) #step3 .hero-card { background:var(--surface);border-color:var(--line); }
