@@ -1093,7 +1093,7 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
  #step3 .tk-compare-label{gap:4px;}
 }
 </style>
-<link rel="stylesheet" href="assets/web-team-alignment.css">
+<link rel="stylesheet" href="assets/web-team-alignment.css?v=2">
 </head>
 <body>
 <div class="ambient-scene" aria-hidden="true"><div class="ambient-orbit"><i></i><i></i><i></i></div></div>
@@ -1102,10 +1102,10 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
   <div class="hero">
     <div class="brand-row">
       <a class="brand-home" href="https://www.couchbase.com/" aria-label="Couchbase website"><img class="brand-logo" src="assets/couchbase-logo.svg" alt="Couchbase" width="170" height="35"></a>
-      <div class="theme-control"><span aria-hidden="true">Light</span><button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark mode"><span class="switch-thumb"></span></button><span aria-hidden="true">Dark</span></div>
+      <nav class="brand-links" aria-label="Couchbase links"><a href="https://www.couchbase.com/products/ai-data-plane/">AI Data Plane</a><a href="https://www.couchbase.com/pricing/">Pricing</a><a href="https://docs.couchbase.com/ai/get-started/intro.html">Documentation</a></nav><div class="theme-control"><span aria-hidden="true">Light</span><button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark mode"><span class="switch-thumb"></span></button><span aria-hidden="true">Dark</span></div>
     </div>
     <div class="intro brand-intro">
-      <div class="intro-copy"><h1>AI savings estimator</h1>
+      <div class="intro-copy"><p class="hero-kicker">AI savings estimator</p><h1>What could your AI workload save?</h1>
       <p class="subhead">Less repetition. Better context.<br>Explore what your AI could save.</p></div>
       <div class="custom-art" aria-hidden="true"><svg viewBox="0 0 440 180" xmlns="http://www.w3.org/2000/svg" focusable="false">
   <path class="art-orbit" d="M40 92C100 12 333 8 402 96C329 172 111 177 40 92Z" fill="none" stroke="currentColor" stroke-width="1"/>
@@ -1124,6 +1124,7 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
 
   <div class="layout">
     <main id="calculator" aria-label="AI savings calculator">
+      <div class="calculator-intro"><h2>See where your AI spend could go further</h2><p>Enter your spend and choose your workload to explore potential model savings.</p></div>
       <nav class="step-nav" aria-label="Calculator sections">
         <ol>
           <li><button type="button" data-go-step="1" aria-current="step">Spend</button></li>
@@ -1360,6 +1361,9 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
     </aside>
 
       </section>
+      <aside class="estimate-placeholder" aria-labelledby="placeholderTitle"><h2 id="placeholderTitle">Your annual impact</h2><div class="pending-estimate"><span>Potential yearly savings</span><strong>Complete your estimate</strong><p>Review your spend and workload to see your results.</p></div><div class="sidebar-method"><h3>What goes into the estimate</h3><p>Your current bill, the work your app does, and the reductions you select.</p><a href="methodology.html" target="_blank" rel="noopener">Methodology &amp; sources</a></div></aside>
+      <section class="review-inputs" aria-labelledby="reviewInputsTitle"><h2 id="reviewInputsTitle">Your estimate at a glance</h2><p>Review your inputs or adjust them to explore another scenario.</p><dl><div><dt>Current annual cost</dt><dd id="reviewAnnual"></dd></div><div><dt>Selected workload</dt><dd id="reviewPatterns"></dd></div><div><dt>Cost basis</dt><dd id="reviewBasis"></dd></div></dl><div class="review-actions"><button type="button" class="back-action" data-go-step="1">Edit spend</button><button type="button" class="back-action" data-go-step="2">Edit workload</button></div></section>
+      <section class="inline-methodology" aria-labelledby="inlineMethodTitle"><h2 id="inlineMethodTitle">Methodology &amp; assumptions</h2><details><summary>How savings are calculated</summary><p>Caching reduces repeat model calls. Memory, retrieval, and tool search reduce input tokens. Reductions are combined rather than added.</p></details><details><summary>What the estimate includes</summary><p>Model costs only. Couchbase, implementation, and any existing GPU commitments must be considered separately.</p></details><details><summary>Where the assumptions come from</summary><p>Defaults draw on published research and product benchmarks. Replace them with measurements from your own workload when available.</p><a href="methodology.html" target="_blank" rel="noopener">View all methodology and sources</a></details></section>
     </main>
   </div>
 
@@ -1760,6 +1764,9 @@ function render(){
   document.querySelectorAll('.tk-token-only').forEach(el => el.classList.toggle('tk-hidden', gpu));
   document.getElementById('spendEcho').textContent = fmtUSD(r.annual);
   document.getElementById('fleetEcho').textContent = fmtUSD(R);
+  document.getElementById('reviewAnnual').textContent = fmtUSD(gpu ? R : r.annual);
+  document.getElementById('reviewPatterns').textContent = LEVERS.filter(l=>state.enabled.has(l.id)).map(l=>l.shortName).join(', ') || 'None selected';
+  document.getElementById('reviewBasis').textContent = gpu ? 'Dedicated GPUs compared with serverless' : 'Current model-provider bill';
   document.getElementById('serverlessEcho').textContent = fmtUSD(S);
   const be = breakEvenRequests();
   document.getElementById('breakEvenEcho').textContent = Number.isFinite(be) ? `${fmtCount(be)} requests/mo` : 'No finite break-even';
@@ -1779,6 +1786,7 @@ function render(){
 
   const savingsEl = document.getElementById('savingsValue');
   const savingsPctEl = document.getElementById('savingsPct');
+  const leverPart = r.n ? fmtRange(r.low, r.high, fmtUSD) : '';
   if(gpu){
     if(!ready){
       savingsEl.textContent = 'Check your inputs';
