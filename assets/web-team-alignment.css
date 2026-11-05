@@ -420,18 +420,25 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root[data-theme=dark] .preset-row button[aria-pressed=true],:root[data-theme=dark] .share-presets button[aria-pressed=true],:root[data-theme=dark] #gpuInputs>.button-row button[aria-pressed=true] { border-color:#999; }
 
 /* One banner surface: artwork sits directly on beige, not inside another card. */
-:root[data-theme=dark] .intro.brand-intro {
+:root:is([data-theme=dark],:not([data-theme=dark])) .intro.brand-intro {
  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center;gap:40px;
  min-height:360px;padding:40px 32px;border-radius:12px;overflow:hidden;
 }
-:root[data-theme=dark] .intro-copy { max-width:none; }
-:root[data-theme=dark] .custom-art {
+:root:is([data-theme=dark],:not([data-theme=dark])) .intro-copy { max-width:none; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .custom-art {
  position:relative;inset:auto;width:100%;height:280px;margin:0;padding:0;
  background:transparent;border:0;border-radius:0;box-shadow:none;--art-paper:#fff0da;
 }
-:root[data-theme=dark] .custom-art svg { transform:none; }
-:root[data-theme=dark] .brand-row { border-radius:12px; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .custom-art svg { transform:none; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .brand-row { border-radius:12px; }
 @media(max-width:760px){
- :root[data-theme=dark] .intro.brand-intro{grid-template-columns:1fr;gap:24px;padding:32px 24px;}
- :root[data-theme=dark] .custom-art{height:200px;}
+ :root:is([data-theme=dark],:not([data-theme=dark])) .intro.brand-intro{grid-template-columns:1fr;gap:24px;padding:32px 24px;}
+ :root:is([data-theme=dark],:not([data-theme=dark])) .custom-art{height:200px;}
 }
+
+/* Theme changes color, never banner geometry or placement. */
+:root:not([data-theme=dark]) .hero { background:var(--page); }
+:root:not([data-theme=dark]) .intro.brand-intro { background:#fff0da;margin-top:28px; }
+:root:not([data-theme=dark]) .brand-intro h1,:root:not([data-theme=dark]) .hero-kicker { color:#211e19; }
+:root:not([data-theme=dark]) .brand-intro .subhead { color:#655747; }
+:root:not([data-theme=dark]) .brand-row { background:var(--surface);border:1px solid var(--line); }
