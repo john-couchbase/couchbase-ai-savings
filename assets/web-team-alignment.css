@@ -442,3 +442,19 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root:not([data-theme=dark]) .brand-intro h1,:root:not([data-theme=dark]) .hero-kicker { color:#211e19; }
 :root:not([data-theme=dark]) .brand-intro .subhead { color:#655747; }
 :root:not([data-theme=dark]) .brand-row { background:var(--surface);border:1px solid var(--line); }
+
+/* A shared centerline from header to calculator at every breakpoint. */
+:root:is([data-theme=dark],:not([data-theme=dark])) .intro.brand-intro { min-height:400px; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .custom-art { height:300px; }
+@media(max-width:1100px){
+ :root .hero .brand-row,:root:is([data-theme=dark],:not([data-theme=dark])) .intro.brand-intro { width:100%;max-width:760px;margin-left:auto;margin-right:auto; }
+}
+@media(max-width:760px){
+ :root:is([data-theme=dark],:not([data-theme=dark])) .intro.brand-intro { min-height:0;gap:20px;padding:36px 24px; }
+ :root .intro-copy { text-align:center;justify-self:center;width:100%;min-width:0; }
+ :root .brand-intro h1 { max-width:18ch;margin-left:auto;margin-right:auto;text-wrap:balance; }
+ :root .brand-intro .subhead { max-width:32ch;margin-left:auto;margin-right:auto;text-wrap:balance; }
+ :root:is([data-theme=dark],:not([data-theme=dark])) .custom-art { height:220px;max-width:400px;justify-self:center; }
+ .calculator-intro { text-align:center; }
+ .calculator-intro h2,.calculator-intro p { text-wrap:balance; }
+}
