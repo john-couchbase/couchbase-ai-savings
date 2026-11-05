@@ -38,73 +38,50 @@ Everything editable sits in the config block at the top of the `<script>`:
 
 ## Calculation spec
 
-```
-annual spend          = monthly spend × 12
-lever fraction (f)    = share of spend × reduction rate
-caching fraction (f)  = cache-eligible share × hit rate          (from the selected traffic shape)
-lever on its own      = annual spend × f                         (low and high calculated separately)
-total savings         = annual spend × [1 − Π(1 − f_i)]          over enabled levers
-overlap row           = Σ(lever on its own) − total savings
-% of spend            = total savings ÷ annual spend
-```
+Input and output charges are calculated separately. In per-token mode, the visitor
+enters the percentage of their bill spent on input tokens (50% is an illustrative,
+editable assumption). In GPU mode, the input-cost fraction is derived from input/output
+token counts multiplied by their respective prices.
 
-The total doesn't depend on lever order and is always below annual spend.
-
-### Dedicated GPU path
-
-When the visitor picks "Dedicated GPUs" in Step 1, the token spend the levers act on becomes the serverless bill for their traffic:
+For each enabled prompt-reduction lever, `f = workload share × reduction rate`.
+Caching uses `c = cache-eligible share × hit rate` (zero when disabled).
 
 ```
-dedicated per year    = instances × hourly rate × hours per month × 12
-serverless per year   = requests per month × 12 × (input tokens × input price + output tokens × output price) ÷ 1,000,000
-switch savings (D)    = dedicated − serverless                     (can be negative)
-lever savings (L)     = serverless × [1 − Π(1 − f_i)]              (low and high)
-total savings         = D + L
-fleet multiple        = dedicated ÷ serverless
-break-even requests   = (dedicated ÷ 12) ÷ serverless cost per request
+input keep = (1 − c) × product(1 − f) over enabled prompt-reduction levers
+output keep = 1 − c
+remaining bill = annual input cost × input keep + annual output cost × output keep
+lever savings = annual token bill − remaining bill
+GPU total savings = annual dedicated fleet cost − remaining serverless bill
 ```
 
-Display rules:
+Low/high savings are computed separately. The bill comparison and break-even use
+these combined bill reduction fractions. A complete bill reduction has no finite
+break-even, rather than an infinite numeric value. Prompt reductions alone cannot
+eliminate output charges. This remains a directional model assuming multiplicative
+overlap; it does not measure overlap or net out Couchbase/implementation costs.
 
-- If the high end of the total is 0 or less, the headline reads "No serverless savings at this traffic" and the sub-text gives the gap. The recommendation box for Capella Model Service provisioned GPUs appears, and the before/after caption points to it.
-- If only the low end is below 0, show "Up to $X". No recommendation box, because serverless with the levers can still win.
-- The break-even card shows the crossover before the levers. With levers on, a note adds the lever-adjusted crossover: break-even ÷ (1 − combined lever fraction), low and high.
+### Regression examples
 
-### Test cases
+Per-token defaults: $20,000/month and 50% of costs assigned to input tokens.
 
-Use these to check a port. All of them use $20,000 per month ($240,000 per year), default shares (Agent Memory 25%, retrieval 30%, tool search 15%), and default rates.
+| Scenario | Annual savings |
+|---|---|
+| Caching only, Not sure yet | $16,200–$43,200 |
+| Agent Memory only | $9,900–$13,500 |
+| Retrieval only | $14,040–$22,320 |
+| Tool search only | $8,820 |
+| All four at defaults | $44,107–$75,738 |
+| GPU defaults, no levers | $94,687 |
+| GPU defaults, all four | $97,955–$100,636 |
+| GPU defaults, tool search only, 100% workload share | $3,881 lever savings |
+| GPU input price $0, prompt reductions only | $0 lever savings |
 
-| Scenario | Expected total | % of spend |
-|---|---|---|
-| Caching only, "Not sure yet" | $16,200 – $43,200 | 7–18% |
-| Agent Memory only | $19,800 – $27,000 | 8–11% |
-| Hybrid Search retrieval only | $28,080 – $44,640 | 12–19% |
-| Agent Catalog tool search only | $17,640 | 7% |
-| All four, "Not sure yet" | $72,014 – $108,276 | 30–45% |
-| All four, "FAQ knowledge base", all three sliders at 100% | $202,231 – $225,163 | 84–94% |
+With all four on, default token-mode overlap is $4,853–$12,102, and the
+remaining model bill is $164,262–$195,893/year. GPU fleet cost and the pre-lever
+break-even are unchanged ($115,807/year and about 5.5M requests/month).
 
-With all four on at defaults, the overlap row shows −$9,706 to −$24,204.
-
-**Before/after bars ("Your annual model bill").** These appear under the savings card once there's something to compare. "Today" is the annual token spend on the per-token path, or the fleet cost on the GPU path. "With the AI Data Plane" is that bill minus the savings, with the solid bar running to the low end and a lighter band out to the high end. Both bars share one scale, the larger of the two, so the gap between them shows the savings.
-
-| Scenario | Today | With the AI Data Plane | Caption |
-|---|---|---|---|
-| Per token, all four levers, defaults | $240,000 | $131,724 – $167,986 | 30–45% less than you spend today |
-| GPU path, no levers, defaults | $115,807 | $21,120 | 82% less than the fleet costs today |
-| GPU path, all four levers, defaults | $115,807 | $11,592 – $14,783 | 87–90% less than the fleet costs today |
-| GPU path, 10M requests/mo, no levers | $115,807 | $211,200 (longer bar) | At this traffic, serverless costs more than the fleet |
-
-**Dedicated GPU path.** Defaults: 2 instances × $6.61/hour (1-year reserved) × 730 hours; 1M requests a month at 2,000 in / 400 out tokens; Nova 2 Lite at $0.33 / $2.75.
-
-| Scenario | Fleet / yr | Serverless / yr | Expected total | Break-even |
-|---|---|---|---|---|
-| No levers | $115,807 | $21,120 | $94,687 | 5.5M requests/mo |
-| All four levers, "Not sure yet" | $115,807 | $21,120 | $101,024 – $104,216 (levers $6,337 – $9,528) | 5.5M |
-| On-demand rate, no levers | $183,785 | $21,120 | $162,665 | 8.7M |
-| 3-year reserved rate, no levers | $79,366 | $21,120 | $58,246 | 3.8M |
-| 10M requests/mo, no levers | $115,807 | $211,200 | "No serverless savings at this traffic" (serverless costs $95,393 more), provisioned GPU box shown | 5.5M |
-| 10M requests/mo, all four levers | $115,807 | $211,200 | "No serverless savings at this traffic" (serverless costs $109 – $32,020 more even with levers), box shown | 5.5M; 7.8M–10M with levers |
-| 7M requests/mo, all four levers | $115,807 | $147,840 | $12,328 – $34,666, no box | 5.5M; 7.8M–10M with levers |
+Run `node --test tests/math.test.cjs` for regression coverage. The page needs no
+build step; Node is needed only to run these development tests.
 
 ## Lead capture
 
@@ -130,3 +107,20 @@ If analytics capture what visitors enter, update the FAQ answer "nothing you ent
 - [ ] SEO: title and meta description are in place; consider FAQPage structured data for the FAQ block
 - [ ] Check all docs links resolve at launch, since docs URLs move between releases
 - [ ] Add the trademark line for the model names cited in the methodology (GPT-4o, Gemini), if the house rule requires it beyond the generic footer line
+
+## Guided estimate update — November 2026
+
+The page now uses three steps: baseline spending, workload selection, and a single
+result. Navigation preserves values. Sources use native disclosure controls outside
+checkbox labels. Advanced rates remain editable, with no focus-stealing table rebuild.
+
+Reserved presets model 730 committed billed hours per month regardless of runtime;
+on-demand and custom rates use entered billed hours. This compares annualized cost,
+not immediately cancellable reserved commitments or cash-flow ROI. Invalid/missing
+values block forward navigation and suppress estimates. Zero values are allowed;
+zero-price serverless models have no finite crossover. Inputs have explicit bounds
+and instances must be whole numbers. Overlap is an assumption, not measured deduplication.
+
+Run all tests: `node --test tests/*.test.cjs`. The seeded generated test checks one
+million scenarios against a separate remaining-cost formula, savings bounds, and
+breakdown identities. It validates implementation consistency, not empirical savings.

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Data Plane Token Savings Estimator | Couchbase</title>
 <meta name="description" content="Estimate how much LLM token spend the Couchbase AI Data Plane could remove from your agent workloads through caching, agent memory, retrieval, and tool search. Directional estimates with every assumption and source shown.">
+<link rel="icon" type="image/svg+xml" href="assets/couchbase-favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -47,24 +48,8 @@ button, input, select { font: inherit; }
   letter-spacing: -0.01em;
 }
 
-.logo-mark {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.55rem;
-  background: var(--cb-red);
-  position: relative;
-  flex: none;
-}
-.logo-mark::after {
-  content: "";
-  position: absolute;
-  left: 0.48rem;
-  right: 0.48rem;
-  bottom: 0.62rem;
-  height: 0.35rem;
-  border-radius: 999px;
-  background: white;
-}
+.brand-logo { display: block; width: 170px; height: auto; flex: none; }
+.brand-row { flex-wrap: wrap; }
 
 .hero-grid {
   display: grid;
@@ -414,65 +399,774 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
 .faq-item[open] summary::after { content: "\2013"; }
 .faq-item[open] summary { margin-bottom: 0.6rem; }
 .faq-item p { margin: 0; color: #d8dce2; font-size: 0.85rem; line-height: 1.5; }
+
+/* Guided estimate: a quiet utility with Couchbase identity. */
+:root { --ink:#18181b; --muted:#595963; --line:#cdd0d5; --cb-red:#e31b23; --action-red:#c81922; --cream:#f5f5f7; --shadow:none; }
+html { scroll-behavior:smooth; }
+body { background:#f1f2f4; font-size:16px; line-height:1.5; }
+[hidden] { display:none !important; }
+.skip-link { position:absolute; top:-5rem; left:1rem; z-index:20; background:#fff; padding:1rem; }
+.skip-link:focus { top:1rem; }
+:focus-visible { outline:3px solid var(--cb-red-dark); outline-offset:4px; }
+.hero,.layout,.wide-section { max-width:1120px; margin:0 auto; padding:0 28px; }
+.hero { padding-top:20px; }
+.brand-row { padding-bottom:16px; border-bottom:1px solid var(--line); gap:18px; font-size:13px; letter-spacing:0; font-weight:500; }
+.brand-logo { width:154px; }
+.intro { display:block; padding:20px 0; max-width:none; }
+h1 { font-size:30px; line-height:1.08; letter-spacing:-.035em; margin:0; font-weight:650; text-wrap:balance; }
+.eyebrow { font-size:12px; color:var(--cb-red); letter-spacing:.08em; font-weight:600; }
+.subhead,.step-description { color:var(--muted); font-size:17px; line-height:1.55; max-width:650px; }
+.layout { display:block; margin-bottom:24px; }
+main { min-width:0; display:block; background:#fff; border:1px solid #bfc4cc; border-radius:14px; overflow:clip; }
+.wizard-step,.validation-summary { grid-column:2; }
+.step-nav { padding:0; position:static; border-bottom:1px solid var(--line); background:#f8f9fa; }
+.step-nav ol { list-style:none; display:flex; gap:0; padding:0; margin:0; border:0; }
+.step-nav li { flex:1; min-width:0; }
+.step-nav li + li { border-left:1px solid var(--line); }
+.step-nav button { width:100%; border:0; border-bottom:3px solid transparent; border-radius:0; background:transparent; padding:18px 24px; color:var(--muted); display:flex; align-items:center; justify-content:flex-start; gap:12px; cursor:pointer; font-size:14px; text-align:left; }
+.step-nav button span { display:grid; place-items:center; width:28px; height:28px; flex:none; border-radius:8px; background:#e7e7eb; font-size:12px; }
+.step-nav button[aria-current] { color:var(--cb-red-dark); background:#fff; border-bottom-color:var(--cb-red); font-weight:600; }
+.step-nav button[aria-current] span { background:var(--action-red); color:white; }
+.wizard-step { background:#fff; border:0; border-radius:0; padding:24px; }
+h2 { font-size:24px; font-weight:600; letter-spacing:-.025em; margin:4px 0 10px; }
+h2:focus { outline:none; }
+h3,.tk-subhead { font-size:19px; font-weight:600; margin-top:28px; }
+.step-description { margin:0 0 20px; font-size:14px; }
+.field { border:0; border-bottom:1px solid #ededf0; border-radius:0; background:transparent; padding:24px 0; gap:24px; grid-template-columns:minmax(0,1fr) 180px; }
+.field label { font-weight:600; }
+.field p,.source-line { color:var(--muted); font-size:14px; line-height:1.5; font-weight:400; }
+.field-controls { min-width:0; }
+input[type=number],select { border:1px solid #b9b9c2; border-radius:10px; color:var(--ink); background:#fff; font-size:16px; min-height:48px; padding:12px 14px; font-weight:400; width:100%; }
+input:disabled { background:#f0f0f3; color:#656570; }
+input[type=checkbox],input[type=radio] { accent-color:var(--cb-red); width:20px; height:20px; flex:none; }
+input[type=range] { accent-color:var(--cb-red); min-height:36px; width:100%; }
+input[aria-invalid=true] { border-color:#b42318; }
+.gpu-assumptions { margin-top:20px; padding:18px 0; border-top:1px solid var(--line); }
+.tk-compare-label strong { min-width:0; overflow-wrap:anywhere; }
+.field-error { display:block; color:#b42318; font-size:13px; margin-top:6px; }
+.validation-summary { padding:14px 18px; border-radius:12px; border:1px solid #e5b7b3; color:#9b211a; background:#fff5f4; }
+.tk-mode-grid { gap:12px; margin:20px 0; }
+.check-card { border:1px solid var(--line); border-radius:8px; box-shadow:none; padding:16px; font-weight:500; background:#fff; align-items:flex-start; }
+.check-card:has(input:checked) { border-color:var(--cb-red); background:#fff7f7; }
+.check-card small { color:var(--muted); font-size:14px; font-weight:400; line-height:1.5; }
+.button-row { gap:8px; flex-wrap:wrap; }
+.tk-ghost-btn,.back-action { min-height:44px; background:#fff; border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:10px 14px; font-size:14px; font-weight:500; cursor:pointer; }
+.tk-ghost-btn:hover,.back-action:hover { background:#eaeaec; }
+.primary-action { display:inline-flex; justify-content:center; align-items:center; gap:14px; min-height:48px; padding:12px 24px; border:0; border-radius:12px; background:var(--action-red); color:#fff; text-decoration:none; font-size:15px; font-weight:600; cursor:pointer; }
+.primary-action:hover { background:#a8171e; color:#fff; }
+.step-actions { margin-top:24px; padding-top:20px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.step-actions>span { color:var(--muted); font-size:14px; }
+.tool-groups { gap:12px; }
+.tool-group { padding:16px 20px; border:1px solid var(--line); border-radius:8px; background:#fff; box-shadow:none; }
+.tool-group:has(input[type=checkbox]:checked) { border-color:var(--cb-red); background:#fffafa; }
+.tool-group>.check-card { border:0; padding:0; border-radius:0; background:transparent; }
+.tool-group .check-card:has(input:checked) { background:transparent; }
+.workload-name { font-size:18px; font-weight:600; }
+.tk-lever-controls { border:0; padding:18px 0 0 32px; margin:0; }
+.tk-lever-controls label { font-size:14px; font-weight:500; }
+.tk-lever-savings { font-size:13px; color:var(--muted); font-weight:400; }
+.source-details { margin:12px 0 0 32px; font-size:13px; }
+.source-details summary { color:var(--muted); font-weight:400; cursor:pointer; padding:8px 0; }
+.source-content { padding:12px 0; line-height:1.6; color:var(--muted); }
+a { color:#a61b22; }
+.source-content a { display:inline-block; padding:4px 0; }
+.archetype-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.archetype-grid label { padding:12px; font-weight:400; }
+.results-panel { position:static; top:auto; }
+.panel { border:0; padding:0; background:transparent; box-shadow:none; }
+.result-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:0; border:1px solid var(--line); border-radius:10px; overflow:clip; }
+.result-card.primary { grid-column:auto; background:#fff5f5; color:var(--ink); border:0; border-right:1px solid var(--line); padding:28px 24px; border-radius:0; display:flex; flex-direction:column; justify-content:center; }
+.result-card.primary>span { color:var(--cb-red-dark); font-weight:500; }
+.result-card.primary strong { font-size:clamp(28px,3.1vw,38px); letter-spacing:-.035em; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.2; overflow-wrap:anywhere; }
+#savingsPct { color:var(--muted); font-size:14px; font-weight:400; margin:12px 0 0; }
+.tk-compare { border:0; background:transparent; padding:24px 0 0; margin:0; }
+.tk-compare h3 { margin:0 0 6px; font-size:18px; }
+.tk-compare-label strong { font-variant-numeric:tabular-nums; font-weight:600; }
+.tk-bar-after { background:var(--cb-red); }
+.tk-bar-range { background:#f0a6aa; }
+.tk-bar-today { background:#6c6c77; }
+.tk-compare-foot,.tk-compare-sub { color:var(--muted); font-weight:400; }
+.estimate-note { color:var(--muted); font-size:13px; margin:20px 0; }
+.metric-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding-top:16px; }
+.secondary-metric { border:0; background:#f5f5f7; padding:16px; border-radius:12px; }
+.secondary-metric strong { font-size:20px; font-weight:600; }
+.hero-card { background:#fff; color:var(--ink); border:0; border-radius:0; padding:24px 0; border-top:1px solid var(--line); box-shadow:none; }
+.hero-card p,.hero-card strong { color:var(--ink)!important; font-weight:400; font-size:15px; }
+.hero-card strong { font-weight:600; }
+.tk-cta-links { display:none; }
+.sources-panel,.comparison-details { padding:16px; border:1px solid var(--line); border-radius:8px; margin-top:16px; }
+summary { cursor:pointer; min-height:44px; font-weight:500; }
+.advanced { background:transparent; padding:16px; border:0; }
+.tk-rate-table { display:block; overflow-x:auto; font-size:14px; }
+.tk-rate-table input[type=number] { min-width:76px; }
+.summary-box { background:#f5f5f7; border:0; border-radius:12px; padding:16px; overflow-x:auto; }
+.tk-breakdown-table { font-size:13px; }
+.message { border-radius:12px; font-weight:400; }
+.tk-reco { background:#f5f5f7; color:var(--ink); }
+.faq-section { border:0; padding:12px 0; background:transparent; }
+.faq-grid { display:block; }
+.faq-item { background:transparent; border-radius:0; border-bottom:1px solid var(--line); padding:16px 0; color:var(--ink); }
+.faq-item summary { color:var(--ink); font-size:15px; font-weight:500; }
+.faq-item p { color:var(--muted); font-size:14px; }
+.faq-item .plus { display:none; }
+footer { max-width:1120px; margin:0 auto; padding:28px; color:var(--muted); font-size:12px; }
+::selection { background:#f9d9dc; color:#721116; }
+input { caret-color:var(--cb-red); }
+button,a,input,select,summary { -webkit-tap-highlight-color:transparent; }
+button,.primary-action,.check-card { transition:background-color 160ms ease,border-color 160ms ease; }
+button:active,.primary-action:active { filter:brightness(.94); }
+button:disabled { opacity:.45; cursor:default; }
+button[aria-pressed=true] { color:var(--cb-red-dark); border-color:var(--cb-red); background:#fff0f0; }
+.intro .subhead { font-size:14px; max-width:none; margin:8px 0 0; }
+.wizard-step>h2 { margin-top:0; }
+.preset-label { color:var(--muted); font-size:13px; margin:20px 0 8px; }
+.preset-row { margin:0; }
+.share-presets { display:flex; gap:8px; margin-top:8px; }
+.share-presets button { flex:1; padding:8px; font-size:13px; }
+.workload-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 0 16px; border-bottom:1px solid var(--line); }
+.workload-toolbar output { margin-right:auto; color:var(--muted); font-size:14px; }
+.tool-group>.check-card { min-height:56px; gap:16px; }
+.tool-group>.check-card:has(input:checked) .workload-name { color:var(--cb-red-dark); }
+.tk-lever-controls { padding-left:36px; }
+.source-details { margin-left:36px; }
+.source-details summary { display:flex; align-items:center; min-height:44px; }
+.source-details summary::before { content:''; width:8px; height:8px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(-45deg); margin-right:12px; }
+.source-details[open] summary::before { transform:rotate(45deg); }
+.source-details summary::-webkit-details-marker { display:none; }
+.tk-lever-controls .archetype-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.tk-lever-controls .archetype-grid label { display:flex; align-items:center; gap:8px; padding:12px; min-height:48px; border-radius:10px; }
+.tk-compare { grid-column:auto; padding:24px; }
+.tk-compare-row,.tk-compare-row + .tk-compare-row { margin-top:24px; }
+.tk-compare-track { height:16px; border-radius:4px; }
+.tk-bar,.tk-bar-range { height:100%; border-radius:4px; }
+.estimate-note { max-width:74ch; line-height:1.6; }
+#savingsValue { text-wrap:balance; }
+.hero-card .button-row { margin-bottom:0; }
+.hero-card .primary-action { background:#fff; border:1px solid var(--action-red); color:var(--cb-red-dark); }
+.hero-card .primary-action:hover { background:#fff0f0; }
+.back-action { background:transparent; border-color:#b9b9c2; }
+.reference-panel { margin:0; padding:16px 20px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+@media(max-width:900px) {
+ main { display:block; }
+ .step-nav { position:static; padding:0; }
+ .step-nav ol { display:flex; gap:0; margin:0; }
+ .step-nav button { justify-content:center; }
+ .reference-panel { margin-left:0; }
+
+}
+@media(max-width:640px) {
+ .hero,.layout,.wide-section { padding-left:16px; padding-right:16px; }
+ .hero { padding-top:20px; }
+ .brand-row>span { display:none; }
+ .intro { display:block; padding:20px 0; }
+ .intro .subhead { margin-top:8px; max-width:40ch; }
+ .wizard-step { padding:20px 16px; border-radius:0; }
+ h2 { font-size:24px; }
+ .field { display:block; }
+ .field-controls { margin-top:12px; max-width:none; }
+ .tk-mode-grid { grid-template-columns:1fr; }
+ .step-nav button { font-size:12px; gap:5px; padding:12px 2px; }
+ .step-nav button span { width:22px; height:22px; }
+ .step-actions { flex-wrap:wrap; }
+ .step-actions .primary-action { flex:1 0 100%; }
+ .step-actions>span { display:none; }
+ .archetype-grid,.metric-grid { grid-template-columns:1fr; }
+ .tk-lever-controls,.source-details { padding-left:0; margin-left:0; }
+ .tk-compare-label { flex-wrap:wrap; gap:4px; }
+ .result-grid { display:block; }
+ .result-card.primary { padding:24px 20px; border-right:0; border-bottom:1px solid var(--line); }
+ .step-nav button { flex-direction:column; font-size:12px; min-height:68px; }
+ .step-nav button span { width:24px; height:24px; }
+ .tk-lever-controls .archetype-grid { grid-template-columns:1fr; }
+ .preset-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .workload-toolbar output { flex-basis:100%; }
+}
+
+.baseline-sections { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.input-section { min-width:0; border:1px solid var(--line); border-radius:8px; overflow:clip; }
+.input-section h3 { margin:0; padding:12px 16px; font-size:14px; font-weight:600; background:#f6f7f8; border-bottom:1px solid var(--line); }
+.input-section .field { display:block; padding:16px; border:0; }
+.input-section .field-controls { margin-top:12px; }
+.input-section .field p { font-size:13px; min-height:40px; }
+.input-section .field input[type=number] { font-size:22px; font-weight:600; }
+.input-section .preset-label { margin:0; padding:0 16px 8px; }
+.input-section .preset-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); padding:0 16px 16px; }
+.input-section .preset-row button { min-height:40px; }
+#gpuInputs { border:1px solid var(--line); border-radius:8px; padding:20px; }
+#gpuInputs>.tk-subhead:first-child { margin-top:0; }
+.workload-toolbar { margin-bottom:16px; border:0; padding-bottom:0; }
+.hero-card { display:flex; align-items:center; gap:24px; justify-content:space-between; padding:20px; border:1px solid var(--line); border-radius:8px; background:#f8f9fa; }
+.hero-card p { max-width:64ch; font-size:14px; }
+.hero-card .button-row { flex:none; margin:0; }
+.sources-panel>summary,.comparison-details>summary,.reference-panel>summary { min-height:24px; }
+@media(max-width:850px) {
+ .result-grid { display:block; }
+ .result-card.primary { border-right:0; border-bottom:1px solid var(--line); }
+ .baseline-sections { grid-template-columns:1fr; }
+ .input-section .preset-row { grid-template-columns:1fr 1fr; }
+ .hero-card { display:block; }
+ .hero-card .button-row { margin-top:16px; }
+ #gpuInputs { padding:16px; }
+}
+
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation:none!important; transition:none!important; } }
+
+
+/* Neutral surfaces shared by both themes. Red identifies actions, not large panels. */
+:root { --page:#f3f4f5; --surface:#fff; --subtle:#f7f8f9; --selected:#f5f5f6; --ink:#202226; --muted:#5b616a; --line:#d1d5da; --control-line:#aeb5be; --link:#a9151b; }
+:root[data-theme=dark] { color-scheme:dark; --page:#111315; --surface:#1b1e22; --subtle:#22262b; --selected:#2a2e34; --ink:#eef0f3; --muted:#b4bbc5; --line:#454c56; --control-line:#717c89; --link:#ff969a; --cb-red-dark:#ff969a; }
+body { background:var(--page); color:var(--ink); }
+main,.wizard-step,.input-section,.tool-group,.reference-panel,.panel { background:var(--surface); border-color:var(--line); }
+main { border-color:var(--control-line); }
+.step-nav,.input-section h3,.hero-card,.secondary-metric,.summary-box { background:var(--subtle); }
+.step-nav button[aria-current],.check-card:has(input:checked),.tool-group:has(input[type=checkbox]:checked),button[aria-pressed=true] { background:var(--selected); }
+.check-card,.tk-ghost-btn,.back-action,input[type=number],select { background:var(--surface); color:var(--ink); border-color:var(--control-line); }
+.field,.tool-group,.step-actions,.brand-row,.step-nav,.step-nav li + li,.input-section h3,.result-grid,.result-card.primary,.sources-panel,.comparison-details,.hero-card,.faq-item { border-color:var(--line); }
+.result-card.primary { background:var(--subtle); color:var(--ink); }
+.result-card.primary>span { color:var(--muted); }
+.tk-compare,.field { background:transparent; }
+.tk-ghost-btn:hover,.back-action:hover,.hero-card .primary-action:hover { background:var(--selected); }
+.hero-card .primary-action { background:var(--surface); color:var(--link); border-color:var(--control-line); }
+a { color:var(--link); text-underline-offset:3px; }
+.step-nav button span { background:var(--selected); color:var(--muted); }
+.step-nav button[aria-current] span { background:var(--action-red); color:#fff; }
+input:disabled { background:var(--subtle); color:var(--muted); }
+.tk-lever-controls .archetype-grid label { background:var(--surface); border-color:var(--control-line); }
+.tk-lever-controls .archetype-grid label:has(input:checked) { background:var(--selected); border-color:var(--cb-red); }
+.theme-toggle { margin-left:auto; display:inline-flex; align-items:center; gap:8px; min-height:40px; border:1px solid var(--control-line); border-radius:6px; background:var(--surface); color:var(--ink); padding:8px 12px; font-size:13px; font-weight:500; }
+.theme-toggle:hover { background:var(--selected); }
+.theme-toggle::before { content:''; display:block; width:14px; height:14px; border:1.5px solid currentColor; border-radius:50%; background:linear-gradient(90deg,currentColor 50%,transparent 50%); }
+.summary-box,.sources-panel { margin-top:20px; padding:20px; border:1px solid var(--line); border-radius:6px; }
+.summary-box h3,.sources-panel h3 { margin:0 0 16px; font-size:18px; }
+.tk-breakdown-table th,.tk-breakdown-table td,.tk-rate-table th,.tk-rate-table td { border-color:var(--line); color:var(--ink); }
+.tk-breakdown-note { color:var(--muted); }
+#workloadSources { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0 32px; }
+#workloadSources article { border-bottom:1px solid var(--line); padding-bottom:20px; }
+#workloadSources h3 { font-size:16px; margin:0 0 8px; }
+#workloadSources p { font-size:14px; color:var(--muted); }
+.site-footer { text-align:left; padding:28px; margin-top:28px; }
+.footer-top { border-top:1px solid var(--control-line); padding:28px 0; display:grid; grid-template-columns:1fr 2fr; gap:32px; }
+.footer-identity p { margin-top:16px; font-size:13px; }
+.footer-resources { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.footer-resources h2 { font-size:14px; margin:0 0 12px; letter-spacing:0; }
+.footer-resources a { display:block; padding:8px 0; min-height:36px; color:var(--muted); font-size:13px; text-decoration:none; }
+.footer-resources a:hover { color:var(--link); text-decoration:underline; }
+.footer-legal { padding-top:20px; border-top:1px solid var(--line); font-size:11px; }
+:root[data-theme=dark] .brand-logo { content:url('assets/couchbase-logo-dark.svg'); }
+:root[data-theme=dark] .tk-bar-today { background:#929ba8; }
+:root[data-theme=dark] .tk-bar-range { background:#b76168; }
+:root[data-theme=dark] .tk-compare-track { background:#30363d; }
+:root[data-theme=dark] .validation-summary { background:#3a2023; color:#ffb5b9; border-color:#c8636a; }
+:root[data-theme=dark] .field-error { color:#ffb5b9; }
+:root[data-theme=dark] .message { background:var(--subtle); color:var(--ink); }
+:root[data-theme=dark] .message.warning { background:#382d1a; color:#f3d7a7; }
+@media(max-width:640px) {
+ .brand-row { flex-wrap:nowrap; gap:12px; }
+ .brand-row .brand-logo { width:132px; }
+ .theme-toggle { padding:8px; font-size:12px; }
+ .footer-top { grid-template-columns:1fr; gap:20px; }
+ .footer-resources { grid-template-columns:1fr 1fr; gap:20px; }
+ #workloadSources { grid-template-columns:1fr; }
+ .summary-box,.sources-panel { padding:16px; }
+}
+
+
+/* Demo controls: familiar segmented navigation and a physical sliding switch. */
+:root{--page:#f5f5f5;--surface:#fff;--subtle:#f0f1f2;--selected:#ebedef;--ink:#24272c;--muted:#575e68;--line:#d9dce0;}
+:root[data-theme=dark]{--page:#151617;--surface:#212325;--subtle:#2b2e31;--selected:#34383d;--ink:#f4f5f6;--muted:#c1c6cd;--line:#4c5259;}
+main{border:0;border-radius:12px;overflow:visible;}
+.step-nav{background:transparent;border:0;padding:16px 20px 0;}
+.step-nav ol{display:flex;background:var(--subtle);border:1px solid var(--line);border-radius:9px;padding:4px;gap:4px;max-width:480px;margin:0;}
+.step-nav li+li{border:0;}
+.step-nav button{border:0;border-radius:6px;padding:10px 24px;min-height:42px;justify-content:center;font-size:14px;color:var(--muted);}
+.step-nav button[aria-current]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px #0002;border:0;}
+.step-nav button:hover{color:var(--ink);}
+.wizard-step{padding:24px 20px;border-radius:12px;}
+.theme-control{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px;}
+.theme-toggle{position:relative;width:48px;min-width:48px;height:28px;min-height:28px;padding:0;border:0;border-radius:16px;background:#7b828b;margin:0;}
+.theme-toggle::before{display:none;}
+.switch-thumb{position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:0 1px 3px #0005;transition:transform 180ms ease;}
+.theme-toggle[aria-checked=true]{background:var(--action-red);}
+.theme-toggle[aria-checked=true] .switch-thumb{transform:translateX(20px);}
+.theme-toggle:hover{filter:brightness(1.08);background:#7b828b;}
+.theme-toggle[aria-checked=true]:hover{background:var(--action-red);}
+.settings-link{background:transparent;border:1px solid var(--control-line);color:var(--ink);font-size:13px;border-radius:6px;padding:10px 14px;margin-top:16px;font-weight:500;min-height:42px;}
+.settings-link:hover{background:var(--selected);}
+dialog{padding:24px;width:min(720px,calc(100% - 32px));max-height:85vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);}
+dialog::backdrop{background:#0008;}
+.dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.dialog-heading h2{margin:0;font-size:22px;}
+dialog .sources-panel{padding:0;border:0;}
+.footer-top{padding:24px 0;}.site-footer{margin-top:8px;}
+.footer-legal{display:flex;flex-wrap:wrap;gap:8px;}
+.tool-group{padding:16px;}.tool-group>.check-card{min-height:48px;}
+.result-card.primary strong{letter-spacing:-.025em;}
+@media(max-width:640px){
+.step-nav{padding:12px 12px 0;}.step-nav ol{max-width:none;}
+.step-nav button{min-height:42px;padding:10px 8px;flex-direction:row;font-size:13px;}
+.theme-control{gap:6px;font-size:11px;}.theme-toggle{padding:0;}
+.brand-row .brand-logo{width:120px;}
+.wizard-step{padding:20px 16px;}dialog{padding:16px;}
+}
+@media(prefers-reduced-motion:reduce){.switch-thumb{transition:none;}}
+
+
+/* Official AI Data Plane artwork: warm, textured geometry beside a quiet utility. */
+.intro.brand-intro { position:relative; isolation:isolate; overflow:hidden; background:#fff1da; border:1px solid #eddcc0; border-radius:12px; margin:20px 0; padding:24px 28px; min-height:156px; display:flex; align-items:center; }
+.intro-copy { position:relative; z-index:1; max-width:60%; }
+.brand-intro h1 { color:#26221d; font-size:32px; }
+.brand-intro .subhead { color:#54483b; font-size:14px; margin:10px 0 0; }
+.brand-art { position:absolute; inset:0 0 0 auto; width:54%; pointer-events:none; animation:art-arrive 900ms cubic-bezier(.16,1,.3,1) both; }
+.brand-art img { display:block; width:100%; height:100%; object-fit:cover; object-position:right center; }
+:root[data-theme=dark] .intro.brand-intro { border-color:#6f5537; }
+.wizard-step:not([hidden]) { animation:panel-arrive 200ms ease-out both; }
+@keyframes art-arrive { from{opacity:.45;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
+@keyframes panel-arrive { from{opacity:.65;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
+@media(max-width:640px){
+ .intro.brand-intro { margin:16px 0; padding:20px; min-height:148px; }
+ .brand-intro h1 { font-size:27px; max-width:9ch; }
+ .intro-copy { max-width:64%; }
+ .brand-intro .subhead { font-size:13px; max-width:24ch; }
+ .brand-art { width:30%; opacity:1; animation:none; }
+ .brand-art img { object-position:78% center; }
+ .intro-copy { text-shadow:0 1px 8px #fff1da; }
+}
+@media(prefers-reduced-motion:reduce){.brand-art,.wizard-step:not([hidden]){animation:none;}}
+
+
+/* Original kinetic geometry; inspired by the palette, not a reproduction. */
+:root { --art-paper:#f6ead4; --art-ink:#262724; }
+:root[data-theme=dark] { --art-paper:#292721; --art-ink:#242521; }
+.intro.brand-intro { background:var(--art-paper); border-color:#d9c9ae; min-height:188px; }
+:root[data-theme=dark] .intro.brand-intro { border-color:#625641; }
+.brand-intro h1 { font-family:"Centra No2",Inter,sans-serif; font-weight:500; }
+:root[data-theme=dark] .brand-intro h1 { color:#fff0d6; }
+:root[data-theme=dark] .brand-intro .subhead { color:#d5c6ae; }
+.intro-copy { max-width:52%; text-shadow:none; }
+.custom-art { position:absolute; right:8px; top:0; width:46%; height:180px; color:#b29c75; pointer-events:none; }
+.custom-art svg { width:100%;height:100%;overflow:visible; }
+.art-orbit { opacity:.35; }
+.art-piece { transform-box:fill-box; transform-origin:center; transition:opacity 220ms ease; }
+.custom-art.has-selection .art-piece { opacity:.25; }
+.custom-art.has-selection .art-piece.is-active { opacity:1; }
+.motion-playing .piece-one { animation:assemble-one 2.8s cubic-bezier(.22,1,.36,1) both; }
+.motion-playing .piece-two { animation:assemble-two 2.8s cubic-bezier(.22,1,.36,1) both; }
+.motion-playing .piece-three { animation:assemble-three 2.8s cubic-bezier(.22,1,.36,1) both; }
+.motion-playing .piece-four { animation:assemble-four 2.8s cubic-bezier(.22,1,.36,1) both; }
+.art-satellite { transform-box:fill-box;transform-origin:center; }
+.motion-playing .satellite-a { animation:orbit-arrive 3.2s ease-out both; }
+.motion-playing .satellite-b { animation:star-arrive 3.2s ease-out both; }
+.motion-playing .satellite-c { animation:triangle-arrive 3.2s ease-out both; }
+@keyframes assemble-one { 0%,12%{transform:translate(-72px,36px) rotate(-40deg)} 100%{transform:translate(0) rotate(0)} }
+@keyframes assemble-two { 0%,12%{transform:translate(67px,30px) rotate(35deg)} 100%{transform:translate(0) rotate(0)} }
+@keyframes assemble-three { 0%,12%{transform:translate(-38px,-92px) rotate(65deg)} 100%{transform:translate(0) rotate(0)} }
+@keyframes assemble-four { 0%,12%{transform:translate(68px,-86px) rotate(-55deg)} 100%{transform:translate(0) rotate(0)} }
+@keyframes orbit-arrive { from{transform:translate(28px,38px) scale(.55)} to{transform:translate(0) scale(1)} }
+@keyframes star-arrive { from{transform:rotate(-120deg) scale(.6)} to{transform:rotate(0) scale(1)} }
+@keyframes triangle-arrive { from{transform:translate(-12px,-30px) rotate(75deg)} to{transform:translate(0) rotate(0)} }
+.replay-art { position:absolute;right:16px;bottom:8px;min-height:32px;padding:4px 8px;border:0;background:transparent;color:#655338;font-size:11px;font-weight:500;text-decoration:underline;text-underline-offset:3px; }
+.replay-art:hover { background:#d8b87830;color:#40311d; }
+:root[data-theme=dark] .replay-art { color:#dbc49c; }
+.tool-group { --workload-accent:#df4938; }
+.tool-group[data-lever=agentMemory] { --workload-accent:#c18a22; }
+.tool-group[data-lever=retrieval] { --workload-accent:#648d9e; }
+.tool-group[data-lever=toolSearch] { --workload-accent:#dc8769; }
+.tool-group:has(input[type=checkbox]:checked) { border-color:var(--workload-accent); }
+.tool-group input { accent-color:var(--workload-accent); }
+.tool-group>.check-card .workload-name { color:var(--ink); }
+.workload-name::after { content:'';display:inline-block;width:10px;height:10px;margin-left:10px;background:var(--workload-accent);border-radius:50%; }
+.tool-group[data-lever=agentMemory] .workload-name::after { border-radius:1px; }
+.tool-group[data-lever=retrieval] .workload-name::after { border-radius:1px;transform:rotate(45deg); }
+.tool-group[data-lever=toolSearch] .workload-name::after { border-radius:50% 50% 0 0; }
+:root:not([data-theme=dark]) .input-section h3 { background:#f5f0e7; }
+:root[data-theme=dark] .input-section h3 { background:#2e2b25; }
+:root:not([data-theme=dark]) .step-nav ol { background:#f1ece3; }
+@media(max-width:700px){
+ .intro.brand-intro { min-height:240px;align-items:flex-start;padding:20px; }
+ .intro-copy { max-width:100%; }
+ .brand-intro h1 { max-width:none;font-size:27px; }
+ .brand-intro .subhead { max-width:none;font-size:13px; }
+ .custom-art { height:115px;width:260px;right:4px;top:auto;bottom:8px; }
+ .replay-art { left:12px;right:auto;bottom:8px; }
+}
+@media(prefers-reduced-motion:reduce){.motion-playing .art-piece,.motion-playing .art-satellite{animation:none;}.art-piece{transition:none;}.replay-art{display:none;}}
+
+
+/* Quiet ambient movement; the calculator remains the foreground. */
+body { isolation:isolate; }
+.ambient-scene { position:fixed;inset:0;overflow:hidden;z-index:-1;pointer-events:none; }
+.ambient-orbit { position:absolute;width:80vw;height:80vw;min-width:680px;min-height:680px;right:-38vw;top:6vh;border:1px solid #c89b6320;border-radius:50%;animation:ambient-orbit 75s linear infinite; }
+.ambient-orbit i { position:absolute;width:110px;height:110px;left:12%;top:12%;border:20px solid #df49381a;border-radius:50%; }
+.ambient-orbit i:nth-child(2) { left:75%;top:70%;width:80px;height:80px;border:0;border-radius:12px;background:#edac3820;transform:rotate(25deg); }
+.ambient-orbit i:nth-child(3) { left:5%;top:78%;width:48px;height:48px;border:0;border-radius:0;background:#4b70801c;transform:rotate(45deg); }
+.art-piece { animation:ambient-float 14s ease-in-out infinite alternate; }
+.piece-two { animation-delay:-4s; }.piece-three { animation-delay:-8s; }.piece-four { animation-delay:-11s; }
+.art-satellite { animation:ambient-turn 25s ease-in-out infinite alternate; }
+.satellite-b { animation-delay:-12s; }.satellite-c { animation-delay:-6s; }
+.art-orbit { stroke-dasharray:3 8;animation:orbit-trace 22s linear infinite; }
+@keyframes ambient-orbit { to { transform:rotate(360deg); } }
+@keyframes ambient-float { from { transform:translateY(-4px) rotate(-2deg); } to { transform:translateY(5px) rotate(2deg); } }
+@keyframes ambient-turn { from { transform:rotate(-12deg) translateY(-4px); } to { transform:rotate(18deg) translateY(5px); } }
+@keyframes orbit-trace { to { stroke-dashoffset:-110; } }
+.motion-toggle { padding:6px 0;min-height:36px;border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:underline;text-underline-offset:3px; }
+.motion-paused .ambient-orbit,.motion-paused .art-piece,.motion-paused .art-satellite,.motion-paused .art-orbit { animation-play-state:paused; }
+@media(prefers-reduced-motion:reduce){.ambient-orbit,.art-piece,.art-satellite,.art-orbit{animation:none;}.motion-toggle{display:none;}}
+
+/* Light theme: Couchbase's warm illustration ground, white surfaces, black type. */
+:root:not([data-theme=dark]) {
+ --page:#fff;--surface:#fff;--subtle:#faf9f6;--selected:#fff3ec;
+ --ink:#171715;--muted:#5d5c57;--line:#e5e1da;--control-line:#b7b3ab;
+ --art-paper:#fff0da;--link:#a52a20;
+}
+:root:not([data-theme=dark]) body { background:linear-gradient(180deg,#fffaf1 0,#fff 480px); }
+:root:not([data-theme=dark]) .brand-row { border-bottom-color:#eae5dc; }
+:root:not([data-theme=dark]) .intro.brand-intro { background:#fff0da;border-color:transparent;box-shadow:none; }
+:root:not([data-theme=dark]) .brand-intro h1 { color:#171715; }
+:root:not([data-theme=dark]) .brand-intro .subhead { color:#51483b; }
+:root:not([data-theme=dark]) main { border:1px solid #e9e5df;box-shadow:0 8px 30px #4c371208; }
+:root:not([data-theme=dark]) .step-nav { background:transparent; }
+:root:not([data-theme=dark]) .step-nav ol { background:#f5f3ee;box-shadow:none;border-color:#e7e2d9; }
+:root:not([data-theme=dark]) .step-nav button { color:#625d54;box-shadow:none; }
+:root:not([data-theme=dark]) .step-nav button[aria-current] { background:#fff;color:#171715;box-shadow:0 1px 5px #36270e12; }
+:root:not([data-theme=dark]) .input-section { border-color:#e5e1da; }
+:root:not([data-theme=dark]) .input-section h3 { background:#faf9f6;border-bottom-color:#eae6df; }
+:root:not([data-theme=dark]) .check-card { border-color:#d4cfc6;background:#fff; }
+:root:not([data-theme=dark]) .check-card:has(input:checked) { border-color:#d93629;background:#fff8f3; }
+:root:not([data-theme=dark]) .tool-group { background:#fff;border-color:#ddd7ce; }
+:root:not([data-theme=dark]) .tool-group:has(input[type=checkbox]:checked) { background:#fffbf6;border-color:var(--workload-accent); }
+:root:not([data-theme=dark]) .tool-group>.check-card,:root:not([data-theme=dark]) .tool-group>.check-card:has(input:checked) { background:transparent; }
+:root:not([data-theme=dark]) .preset-row button { background:#fff;border-color:#d4cfc6;color:#514d46; }
+:root:not([data-theme=dark]) .preset-row button[aria-pressed=true] { background:#fff3eb;border-color:#d93629;color:#a52a20; }
+:root:not([data-theme=dark]) input[type=number],:root:not([data-theme=dark]) select { background:#fff;border-color:#b7b3ab;box-shadow:none; }
+:root:not([data-theme=dark]) .primary-action { background:#d93629;border-color:#d93629;color:#fff;box-shadow:none; }
+:root:not([data-theme=dark]) .primary-action:hover { background:#b82c21;border-color:#b82c21; }
+:root:not([data-theme=dark]) .result-card.primary { background:#fff8eb; }
+:root:not([data-theme=dark]) .tk-bar-today { background:#686b66; }
+:root:not([data-theme=dark]) .tk-bar-after { background:#d93629; }
+:root:not([data-theme=dark]) .tk-bar-range { background:#eca797; }
+:root:not([data-theme=dark]) .ambient-scene { opacity:.55; }
+:root:not([data-theme=dark]) .footer-top { border-top-color:#e5e1da; }
+
+
+/* Readable supporting copy and direct workload inputs. */
+.brand-intro .subhead,.intro .subhead { font-size:16px;line-height:1.6; }
+.step-description,.wizard-step>.subhead,.field p,.input-section .field p,.check-card small { font-size:16px!important;line-height:1.6; }
+.check-card small { margin-top:6px;max-width:58ch; }
+.workload-name { font-size:20px;line-height:1.4; }
+.tool-group { padding:22px; }
+.tool-group>.check-card { gap:16px; }
+.tool-group>.check-card:has(input:checked) .workload-name { color:var(--ink); }
+.tool-group input[type=checkbox] { width:21px;height:21px;flex-shrink:0; }
+.tk-lever-controls { margin-top:20px;padding-top:20px;border-top:1px solid var(--line); }
+.share-editor label { display:block;font-size:16px;font-weight:600;line-height:1.5; }
+.share-editor p { font-size:15px;line-height:1.6;color:var(--muted);margin:6px 0 14px; }
+.share-options { display:flex;gap:10px;align-items:center;flex-wrap:wrap; }
+.share-options input[type=number] { width:110px;min-height:48px;font-size:20px;padding:10px 12px; }
+.share-options button { min-height:48px;min-width:66px;padding:10px 16px;background:var(--surface);color:var(--ink);border:1px solid var(--control-line);border-radius:6px;font-size:16px; }
+.share-options button[aria-pressed=true] { border-color:var(--cb-red);background:var(--selected); }
+.tk-lever-controls .archetype-grid label { font-size:16px;line-height:1.5;padding:12px; }
+#archetypeBlurb,.tk-lever-controls>.source-line { font-size:16px!important;line-height:1.6; }
+#savingsPct,.tk-compare-sub,.tk-compare-foot,.estimate-note,.step-actions>span,.hero-card p { font-size:16px;line-height:1.6; }
+.preset-label,.workload-toolbar output,.input-section h3,.footer-identity p,.footer-resources a { font-size:15px;line-height:1.5; }
+@media(max-width:600px){.tool-group{padding:18px;}.share-options{gap:8px;}.share-options input[type=number]{width:100%;}.share-options button{flex:1;}.brand-intro .subhead{font-size:16px;}.intro.brand-intro{min-height:260px;}}
+
+/* Color belongs to the calculator sections; compact navigation stays centered. */
+.step-nav ol { margin-inline:auto; }
+.brand-home { display:inline-flex;border-radius:5px; }
+.brand-home:focus-visible { outline:3px solid var(--cb-red);outline-offset:6px; }
+.workload-name { font-size:18px;font-weight:600; }
+.check-card small,.field p,.input-section .field p,.step-description,.wizard-step>.subhead { font-size:15px!important;line-height:1.55; }
+.share-editor label { font-size:15px; }
+.share-editor p { font-size:14px;line-height:1.6; }
+.tool-group { padding:20px; }
+:root:not([data-theme=dark]) body { background:#fff8ec; }
+:root:not([data-theme=dark]) main { border-color:#e3d8c8;box-shadow:0 8px 28px #67431c08; }
+:root:not([data-theme=dark]) .step-nav { background:#fffaf2;border-radius:12px 12px 0 0; }
+:root:not([data-theme=dark]) .step-nav ol { background:#f2e6d3;border-color:#e7d7bd; }
+:root:not([data-theme=dark]) .step-nav button[aria-current] { background:#d93629;color:#fff;box-shadow:0 2px 5px #a52a201a; }
+:root:not([data-theme=dark]) .input-section:first-child h3 { background:#fce9d5;border-bottom-color:#efdbc6; }
+:root:not([data-theme=dark]) .input-section:nth-child(2) h3 { background:#e7eff0;border-bottom-color:#d3e0e2; }
+:root:not([data-theme=dark]) .tool-group { --choice-tint:#fff4ed;background:var(--choice-tint);border-color:#e8d6c8;border-left:4px solid var(--workload-accent); }
+:root:not([data-theme=dark]) .tool-group[data-lever=agentMemory] { --choice-tint:#fff8e6; }
+:root:not([data-theme=dark]) .tool-group[data-lever=retrieval] { --choice-tint:#eef5f6;border-color:#d4e1e4;border-left-color:var(--workload-accent); }
+:root:not([data-theme=dark]) .tool-group[data-lever=toolSearch] { --choice-tint:#fff0e9; }
+:root:not([data-theme=dark]) .tool-group:has(input[type=checkbox]:checked) { background:var(--choice-tint);border-color:var(--workload-accent); }
+:root:not([data-theme=dark]) .result-card.primary { background:#fff0d7; }
+:root:not([data-theme=dark]) .tk-compare { background:#f2f7f7; }
+:root:not([data-theme=dark]) .footer-top { border-color:#ded0bb; }
+@media(max-width:600px){.step-nav ol{max-width:480px;margin-inline:auto;}.tool-group{padding:18px;}}
+
+/* Compact results lead directly into the conversation with Couchbase. */
+.step-nav ol { margin-left:0;margin-right:auto; }
+.result-grid { display:block; }
+.result-card.primary { display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 24px;min-height:0;padding:24px;border-right:0;border-bottom:1px solid var(--line); }
+.result-card.primary>span { font-size:16px; }
+.result-card.primary strong { margin:0;font-size:clamp(28px,3vw,38px);grid-column:2;grid-row:1 / 3; }
+.result-card.primary #savingsPct { margin:0;font-size:15px;grid-column:1; }
+#compareBlock:not(.tk-hidden) { display:grid;grid-template-columns:1fr 1fr;column-gap:32px;padding:24px; }
+.tk-compare h3,.tk-compare-sub,.tk-compare-foot { grid-column:1/-1; }
+.tk-compare-row,.tk-compare-row + .tk-compare-row { margin-top:12px; }
+.tk-compare-foot { margin-bottom:0; }
+.hero-card .next-step-copy h3 { font-size:22px;line-height:1.3;letter-spacing:-.4px;margin:0 0 8px; }
+.hero-card .next-step-copy p { font-size:16px;line-height:1.6;color:var(--muted)!important;margin:0;max-width:60ch; }
+.hero-card { padding:24px;gap:28px; }
+.hero-card .primary-action { background:var(--cb-red);border-color:var(--cb-red);color:white;white-space:nowrap;min-height:48px; }
+:root:not([data-theme=dark]) .hero-card { background:#fff0da;border-color:#ead3b0; }
+@media(max-width:700px){
+ .result-card.primary { display:block;padding:20px; }
+ .result-card.primary strong { margin:10px 0; }
+ #compareBlock:not(.tk-hidden) { display:block;padding:20px; }
+ .hero-card { padding:20px; }
+ .hero-card .button-row,.hero-card .primary-action { width:100%; }
+}
+
+/* GPU controls: consistent columns, concise labels, one clear disclosure. */
+#gpuInputs { padding:24px;border:1px solid var(--line);border-radius:10px;background:var(--subtle); }
+#gpuInputs>.input-stack { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px; }
+#gpuInputs .field { display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:0;border:0;min-width:0; }
+#gpuInputs .field-controls { width:100%;min-width:0; }
+#gpuInputs .field p { margin:4px 0 0;font-size:14px!important;line-height:1.5; }
+#gpuInputs label { font-weight:600;font-size:15px; }
+#gpuInputs select { width:100%;min-height:48px;padding:12px 36px 12px 14px;cursor:pointer;border-radius:7px; }
+#gpuInputs>.tk-subhead { font-size:17px;margin:24px 0 16px; }
+#gpuInputs>.tk-subhead:first-child { margin-top:0; }
+#gpuInputs>.source-line { font-size:13px;margin-top:24px;line-height:1.6; }
+.gpu-assumptions { padding:0;margin-top:12px;border:1px solid var(--control-line);border-radius:8px;overflow:hidden;background:var(--surface); }
+.gpu-assumptions>summary { position:relative;list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:50px;padding:12px 40px;font-size:15px;font-weight:600;background:var(--selected); }
+.gpu-assumptions>summary::-webkit-details-marker { display:none; }
+.gpu-assumptions>summary::after { content:'';position:absolute;right:20px;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg); }
+.gpu-assumptions[open]>summary::after { transform:rotate(225deg); }
+#gpuInputs .gpu-assumptions>.field { margin:20px;display:grid;grid-template-columns:1fr minmax(140px,.65fr);align-items:center;gap:20px; }
+.gpu-assumptions>.tk-subhead { margin:24px 20px 16px;font-size:17px; }
+.gpu-assumptions>.input-stack { padding:0 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.gpu-assumptions>.input-stack>.field:first-child { grid-column:1/-1; }
+:root:not([data-theme=dark]) #gpuInputs { background:#f2f6f6;border-color:#d2e0e1; }
+:root:not([data-theme=dark]) #gpuPricing { background:#fff;border-color:#7e9fa4; }
+:root:not([data-theme=dark]) .gpu-assumptions { border-color:#cbdcde; }
+:root:not([data-theme=dark]) .gpu-assumptions>summary { background:#e4eef0;color:#284b52; }
+@media(max-width:600px){
+ #gpuInputs { padding:16px; }
+ #gpuInputs>.input-stack,.gpu-assumptions>.input-stack { grid-template-columns:1fr; }
+ #gpuInputs .gpu-assumptions>.field { display:flex;margin:18px 16px;gap:8px; }
+ .gpu-assumptions>.input-stack { padding:0 16px 18px; }
+}
+
+/* Quiet messages; only actual financial results receive display sizing. */
+.result-card.primary strong { font-size:clamp(25px,2.4vw,32px); }
+.result-card.primary strong.is-message { font-size:16px;font-weight:500;line-height:1.5;letter-spacing:0;text-wrap:wrap; }
+.result-card.primary:has(.is-message) { display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;padding:22px; }
+.result-card.primary:has(.is-message)>span { font-size:14px;color:var(--muted); }
+.result-card.primary:has(.is-message) #savingsPct:empty { display:none; }
+.hero-card { padding:20px 24px;align-items:center;gap:20px;border-radius:8px; }
+.hero-card .next-step-copy p { font-size:16px;line-height:1.5;color:var(--ink)!important;max-width:none; }
+.hero-card .button-row { display:flex;align-items:center;justify-content:center; }
+#step3 .step-actions { border-top:0;padding-top:12px;margin-top:12px; }
+@media(max-width:850px){.hero-card{text-align:center;}.hero-card .button-row{margin-top:16px;}}
+
+/* Progress is explicit; locked steps stay visible but cannot be opened. */
+.step-nav button:disabled { opacity:.45;cursor:not-allowed;box-shadow:none; }
+.step-actions { flex-wrap:wrap;gap:12px; }
+#skipWorkload { margin-left:auto;font-size:14px; }
+.step-description,.wizard-step>.subhead { font-size:16px!important;line-height:1.5; }
+@media(max-width:600px){#skipWorkload{margin-left:0;}.step-actions>[data-next-step="3"]{width:100%;}}
+
+/* One moving indicator connects the stages of the estimate. */
+.step-nav ol { position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;width:100%; }
+.step-nav ol::before { content:'';position:absolute;z-index:0;left:4px;top:4px;bottom:4px;width:calc((100% - 16px)/3);border-radius:6px;background:#d93629;box-shadow:0 2px 6px #9e2b2526;transform:translateX(calc(var(--active-step,0) * (100% + 4px)));transition:transform 340ms cubic-bezier(.22,1,.36,1);pointer-events:none; }
+.step-nav li { position:relative;z-index:1;min-width:0; }
+.step-nav button { position:relative;width:100%;gap:6px;padding-inline:10px;transition:color 180ms ease; }
+.step-nav button[aria-current],:root:not([data-theme=dark]) .step-nav button[aria-current] { background:transparent;box-shadow:none;color:#fff; }
+
+.step-nav button:focus-visible { outline:2px solid var(--ink);outline-offset:3px; }
+@media(prefers-reduced-motion:reduce){.step-nav ol::before{transition:none;}}
+
+/* Consistent typography and one secondary action group. */
+h2,h3,.workload-name { font-family:"Centra No2",Inter,sans-serif;font-weight:500; }
+.step-nav button,.primary-action,.check-card span { font-weight:600; }
+.estimate-note { font-size:14px;line-height:1.6;max-width:none;margin:16px 0; }
+.estimate-note a { white-space:nowrap; }
+.estimate-edits { display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;margin:20px 0; }
+.estimate-edits button { min-height:42px;padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--muted);font-size:14px;font-weight:500; }
+.estimate-edits button:hover { color:var(--ink);background:var(--subtle);border-color:var(--control-line); }
+.estimate-edits button:focus-visible { outline:2px solid var(--cb-red);outline-offset:3px; }
+@media(max-width:480px){.estimate-edits{gap:6px;}.estimate-edits button{padding:10px;font-size:13px;flex:1;}}
+
+/* Native accessible selector with balanced text and a single custom chevron. */
+.select-control { position:relative;width:100%; }
+#gpuInputs .select-control select { appearance:none;-webkit-appearance:none;display:block;text-align:center;text-align-last:center;padding:13px 44px;min-height:50px;line-height:1.4;font-size:15px;font-weight:500;border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color 160ms,box-shadow 160ms; }
+.select-control::after { content:'';position:absolute;right:19px;top:50%;width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none; }
+#gpuInputs .select-control select:hover { border-color:#648d9e; }
+#gpuInputs .select-control select:focus-visible { outline:2px solid #648d9e;outline-offset:3px; }
+#gpuInputs .field:has(.select-control)>div:first-child { text-align:center; }
+:root:not([data-theme=dark]) #gpuInputs .select-control select { background:#fff;border-color:#a6bec2;box-shadow:0 2px 4px #284b5208; }
+
+/* Shared controls in both themes; preserve primary-action emphasis. */
+.gpu-assumptions>summary { min-height:50px;padding:13px 44px;font-size:15px;font-weight:500;line-height:1.4; }
+.gpu-assumptions>summary::after { right:19px;top:50%;width:7px;height:7px;border-width:1.5px;transform:translateY(-70%) rotate(45deg); }
+.gpu-assumptions[open]>summary::after { transform:translateY(-25%) rotate(225deg); }
+:root[data-theme=dark] #gpuInputs .select-control select { background:var(--surface);border-color:#717c89;box-shadow:none; }
+:root[data-theme=dark] #gpuInputs .select-control select:hover { border-color:#9ebdc6; }
+:root[data-theme=dark] #gpuInputs .select-control select:focus-visible { outline-color:#9ebdc6; }
+.tk-ghost-btn,.back-action,.share-options button,.estimate-edits button,.settings-link { min-height:44px;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:500;line-height:1.4;background:var(--surface);color:var(--ink);border:1px solid var(--control-line); }
+.primary-action { border-radius:8px;min-height:48px;padding:12px 20px;line-height:1.4; }
+.tk-ghost-btn:focus-visible,.back-action:focus-visible,.share-options button:focus-visible,.primary-action:focus-visible,.gpu-assumptions>summary:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
+button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);background:var(--selected); }
+@media(max-width:480px){.estimate-edits button{padding:10px;font-size:13px;}}
+
+.enhanced-select::after { display:none; }
+.enhanced-select select[hidden] { display:none!important; }
+.select-trigger { display:flex;align-items:center;justify-content:center;position:relative;width:100%;min-height:50px;padding:13px 44px;border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:15px;font-weight:500;line-height:1.4;cursor:pointer; }
+.select-chevron { position:absolute;right:19px;width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform 160ms; }
+.select-trigger[aria-expanded=true] .select-chevron { transform:translateY(2px) rotate(225deg); }
+.select-trigger[aria-expanded=true],.select-trigger:focus-visible { outline:2px solid #648d9e;outline-offset:3px; }
+.select-menu { position:fixed;inset:auto;margin:0;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);box-shadow:0 12px 32px #0002;overflow:auto; }
+.select-menu:popover-open { display:grid;gap:3px; }
+.select-menu button { min-height:44px;padding:11px 16px;text-align:left;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--ink);font-size:15px;font-weight:400;cursor:pointer; }
+.select-menu button[aria-selected=true] { background:var(--selected);color:var(--link);font-weight:600; }
+.select-menu button:hover { background:var(--subtle); }
+.select-menu button:focus { outline:none;border-color:#648d9e;background:var(--subtle); }
+:root:not([data-theme=dark]) .select-trigger { border-color:#a6bec2;background:#fff; }
+.select-control .select-trigger:hover,.select-control .select-trigger:focus { background:var(--surface);color:var(--ink);border-color:#648d9e; }
+
+/* Workload choices read as a list; nested settings stay visually quiet. */
+.workload-name { font-family:Inter,sans-serif;font-size:19px;font-weight:600;letter-spacing:-.2px;color:var(--ink); }
+.workload-name::after { display:none!important; }
+.tool-group>.check-card { align-items:flex-start!important; }
+.tool-group>.check-card input[type=checkbox] { appearance:none;-webkit-appearance:none;position:relative;width:34px;height:20px;min-width:34px;border:1px solid var(--control-line);border-radius:20px;background:var(--subtle);margin-top:4px;cursor:pointer; }
+.tool-group>.check-card input[type=checkbox]::before { content:'';position:absolute;left:3px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--muted);transition:transform 180ms; }
+.tool-group>.check-card input[type=checkbox]:checked { background:var(--workload-accent);border-color:var(--workload-accent); }
+.tool-group>.check-card input[type=checkbox]:checked::before { transform:translateX(14px);background:#fff; }
+.tool-group>.check-card input[type=checkbox]:focus-visible { outline:2px solid var(--ink);outline-offset:3px; }
+.tk-lever-controls { padding-left:50px;padding-top:16px;margin-top:16px; }
+.tk-lever-controls .archetype-grid { display:flex;flex-direction:column;gap:0; }
+.tk-lever-controls .archetype-grid label,.tk-lever-controls .archetype-grid label:has(input:checked) { border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;padding:12px 0;font-size:15px;font-weight:400; }
+.tk-lever-controls .archetype-grid label:has(input:checked) { color:var(--ink);font-weight:600; }
+.share-options button { border-color:transparent;border-radius:6px;background:var(--subtle);min-width:60px; }
+.share-options button[aria-pressed=true] { border-color:transparent;background:var(--selected);box-shadow:inset 0 -2px var(--workload-accent); }
+.share-editor p { margin-bottom:12px; }
+#compareBlock:not(.tk-hidden) { display:block; }
+.tk-compare-row,.tk-compare-row + .tk-compare-row { margin-top:20px;padding:0; }
+.tk-compare-label { display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:10px; }
+.tk-compare-label strong { white-space:normal;font-size:18px;font-weight:600; }
+.tk-compare-track { height:12px;border:0;border-radius:20px;overflow:hidden;background:var(--line); }
+.tk-bar,.tk-bar-range { min-width:0;height:12px;border-radius:0;transition:width 500ms cubic-bezier(.22,1,.36,1); }
+.tk-bar-range { margin-left:0; }
+#step3:not([hidden]) .tk-compare-track { animation:reveal-cost 550ms cubic-bezier(.22,1,.36,1) both;transform-origin:left; }
+#step3:not([hidden]) [data-row=after] .tk-compare-track { animation-delay:100ms; }
+@keyframes reveal-cost { from{clip-path:inset(0 100% 0 0 round 20px);}to{clip-path:inset(0 0 0 0 round 20px);} }
+.tk-compare-foot { margin-top:16px;font-size:14px;font-weight:500; }
+@media(max-width:600px){.tk-lever-controls{padding-left:0;}.tk-compare-label{display:block;}.tk-compare-label strong{display:block;margin-top:4px;font-size:18px;}.workload-name{font-size:18px;}}
+@media(prefers-reduced-motion:reduce){#step3:not([hidden]) .tk-compare-track{animation:none;}.tk-bar,.tk-bar-range{transition:none;}}
+
+/* One primary answer with a small supporting cost comparison. */
+#step3 .result-grid { border-radius:10px; }
+#step3 .result-card.primary { display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:26px 20px;border:0; }
+#step3 .result-card.primary>span { font-size:15px;font-weight:500; }
+#step3 .result-card.primary strong { font-size:clamp(27px,3.2vw,36px);margin:0;line-height:1.25; }
+#step3 .result-card.primary strong.is-message { font-size:16px; }
+#step3 .result-grid:not(.gpu-result) #savingsPct { display:none; }
+#step3 .result-grid.gpu-result #savingsPct { font-size:14px;max-width:60ch; }
+#step3 #compareBlock:not(.tk-hidden) { display:grid;grid-template-columns:1fr 1fr;gap:0;padding:20px 24px;border-top:1px solid var(--line);background:var(--surface); }
+#step3 #compareTitle { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
+#step3 .tk-compare-sub,#step3 .tk-compare-track,#step3 .tk-compare-foot { display:none; }
+#step3 .tk-compare-row,#step3 .tk-compare-row + .tk-compare-row { margin:0;padding:0 16px;text-align:center; }
+#step3 .tk-compare-row + .tk-compare-row { border-left:1px solid var(--line); }
+#step3 .tk-compare-label { display:flex;flex-direction:column;align-items:center;gap:8px;margin:0;font-size:14px;font-weight:400; }
+#step3 .tk-compare-label strong { font-size:clamp(17px,2vw,21px);font-weight:500;line-height:1.4; }
+@media(max-width:540px){
+ #step3 #compareBlock:not(.tk-hidden){grid-template-columns:1fr;padding:16px 20px;gap:16px;}
+ #step3 .tk-compare-row,#step3 .tk-compare-row + .tk-compare-row{padding:0;border:0;}
+ #step3 .tk-compare-label{gap:4px;}
+}
 </style>
 </head>
 <body>
+<div class="ambient-scene" aria-hidden="true"><div class="ambient-orbit"><i></i><i></i><i></i></div></div>
+<a class="skip-link" href="#calculator">Skip to calculator</a>
 
   <div class="hero">
     <div class="brand-row">
-      <div class="logo-mark" aria-hidden="true"></div>
-      Couchbase<sup style="font-size:0.6em;">&reg;</sup> <span style="color:var(--muted); font-weight:600;">&middot; AI Data Plane Token Savings Estimator</span>
+      <a class="brand-home" href="https://www.couchbase.com/" aria-label="Couchbase website"><img class="brand-logo" src="assets/couchbase-logo.svg" alt="Couchbase" width="170" height="35"></a>
+      <div class="theme-control"><span aria-hidden="true">Light</span><button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark mode"><span class="switch-thumb"></span></button><span aria-hidden="true">Dark</span></div>
     </div>
-    <div class="hero-grid">
-      <div>
-        <p class="eyebrow">AI Data Plane&trade; token and inference savings estimate</p>
-        <h1>Stop paying for tokens and GPU hours your agents don't need.</h1>
-        <p class="subhead">Agents spend tokens on repeat questions, resent conversation history, whole documents where a passage would do, and tool lists the model never uses. The Couchbase AI Data Plane&trade; handles each of these where your data already lives, so your token bill doesn't have to grow in step with the work your agents do. Running models on your own GPUs? Compare that fleet with serverless models billed by the token, then see what the levers save on top. Every assumption and source is on the page.</p>
-      </div>
-      <div class="hero-card">
-        <strong style="font-size:1.05rem;">Important disclaimer</strong>
-        <p>Directional estimates to guide your evaluation, not a formal quote. See the methodology notes below.</p>
-      </div>
+    <div class="intro brand-intro">
+      <div class="intro-copy"><h1>AI savings estimator</h1>
+      <p class="subhead">Less repetition. Better context.<br>Explore what your AI could save.</p></div>
+      <div class="custom-art" aria-hidden="true"><svg viewBox="0 0 440 180" xmlns="http://www.w3.org/2000/svg" focusable="false">
+  <path class="art-orbit" d="M40 92C100 12 333 8 402 96C329 172 111 177 40 92Z" fill="none" stroke="currentColor" stroke-width="1"/>
+  <g class="art-piece piece-one" data-art-lever="caching"><path d="M120 40h68v68h-68z" fill="#df4938"/><circle cx="154" cy="74" r="19" fill="var(--art-paper)"/><path d="M154 55a19 19 0 0 1 19 19" fill="none" stroke="#df4938" stroke-width="8"/></g>
+  <g class="art-piece piece-two" data-art-lever="agentMemory"><path d="M202 40h68v68h-68z" fill="#edac38"/><path d="M213 91V55h13v36m9 0V55h13v36m9 0V55h2v36" stroke="var(--art-ink)" stroke-width="4"/></g>
+  <g class="art-piece piece-three" data-art-lever="retrieval"><path d="M120 122h68v38h-68z" fill="#4b7080"/><path d="m132 149 14-16 14 16 15-16" fill="none" stroke="#fff2dc" stroke-width="3"/></g>
+  <g class="art-piece piece-four" data-art-lever="toolSearch"><path d="M202 122h68v38h-68z" fill="#e98865"/><path d="m215 131 12 10-12 10m20-20 12 10-12 10" fill="none" stroke="var(--art-ink)" stroke-width="3"/></g>
+  <g class="art-satellite satellite-a"><circle cx="330" cy="62" r="27" fill="none" stroke="#edac38" stroke-width="12"/><circle cx="330" cy="62" r="6" fill="#df4938"/></g>
+  <g class="art-satellite satellite-b"><path d="m64 36 5 17 17 5-17 5-5 17-5-17-17-5 17-5z" fill="#df4938"/></g>
+  <g class="art-satellite satellite-c"><path d="m335 121 22 32h-44z" fill="#4b7080"/></g>
+  <circle cx="91" cy="130" r="9" fill="#edac38"/>
+  <circle cx="298" cy="26" r="5" fill="#e98865"/>
+</svg></div>
     </div>
   </div>
 
   <div class="layout">
-    <main>
-      <p class="eyebrow">Step 1</p>
-      <h2>How do you pay for inference today?</h2>
+    <main id="calculator" aria-label="AI savings calculator">
+      <nav class="step-nav" aria-label="Calculator sections">
+        <ol>
+          <li><button type="button" data-go-step="1" aria-current="step">Spend</button></li>
+          <li><button type="button" data-go-step="2">Workload</button></li>
+          <li><button type="button" data-go-step="3">Estimate</button></li>
+        </ol>
+      </nav>
+      <p class="step-status sr-only" id="stepStatus" aria-live="polite"></p>
+      <p class="validation-summary" id="validationSummary" role="alert" hidden></p>
+      <section class="wizard-step" id="step1" data-step="1" aria-labelledby="baselineTitle">
+
+      <h2 id="baselineTitle" tabindex="-1">Your AI spend</h2>
+      <p class="step-description">Choose how you pay, then enter your numbers.</p>
       <div class="tk-mode-grid" role="radiogroup" aria-label="How you pay for inference today">
         <label class="check-card">
           <input type="radio" name="mode" value="token" checked>
           <span style="display:block;">
-            <span>Per token</span>
+            <span>I pay per token</span>
             <small>You pay a model provider or API for the tokens you use.</small>
           </span>
         </label>
         <label class="check-card">
           <input type="radio" name="mode" value="gpu">
           <span style="display:block;">
-            <span>Dedicated GPUs</span>
+            <span>I run dedicated GPUs</span>
             <small>You run models on GPU instances billed by the hour, self-hosted or provisioned.</small>
           </span>
         </label>
       </div>
 
-      <div id="tokenInputs">
+      <div id="tokenInputs"><div class="baseline-sections"><section class="input-section" aria-labelledby="spendSectionTitle"><h3 id="spendSectionTitle">Model spend</h3>
         <div class="field">
           <div>
-            <label for="monthlySpend">Monthly token spend (USD)</label>
-            <p>What you pay model providers each month, across all models and teams.</p>
+            <label for="monthlySpend">Monthly AI model bill (USD)</label>
+            <p>Your total monthly model-provider bill.</p>
           </div>
           <div class="field-controls">
-            <input type="number" id="monthlySpend" min="0" step="500" value="20000" placeholder="0">
+            <input type="number" id="monthlySpend" min="0" step="any" value="20000" placeholder="0">
           </div>
         </div>
-        <div class="button-row">
-          <button type="button" class="tk-ghost-btn" data-spend="5000">$5K/mo &middot; small team</button>
-          <button type="button" class="tk-ghost-btn" data-spend="20000">$20K/mo &middot; mid-market</button>
-          <button type="button" class="tk-ghost-btn" data-spend="75000">$75K/mo &middot; large scale</button>
-          <button type="button" class="tk-ghost-btn" data-spend="250000">$250K/mo &middot; hyperscale</button>
+        <p class="preset-label">Try a monthly spend</p>
+        <div class="button-row preset-row" role="group" aria-label="Monthly spend shortcuts">
+          <button type="button" class="tk-ghost-btn" data-spend="5000">$5,000</button>
+          <button type="button" class="tk-ghost-btn" data-spend="20000">$20,000</button>
+          <button type="button" class="tk-ghost-btn" data-spend="75000">$75,000</button>
+          <button type="button" class="tk-ghost-btn" data-spend="250000">$250,000</button>
         </div>
+</section><section class="input-section" aria-labelledby="shareSectionTitle"><h3 id="shareSectionTitle">Input / output split</h3>
+        <div class="field">
+          <div>
+            <label for="inputSpendShare">Input-cost share (%)</label>
+            <p>The part of your bill spent on prompts. 50% is a starting assumption.</p>
+          </div>
+          <div class="field-controls"><input type="number" id="inputSpendShare" min="0" max="100" step="1" value="50">
+            <div class="share-presets" role="group" aria-label="Input-cost share shortcuts"><button type="button" class="tk-ghost-btn" data-input-share="25" aria-pressed="false">25%</button><button type="button" class="tk-ghost-btn" data-input-share="50" aria-pressed="true">50%</button><button type="button" class="tk-ghost-btn" data-input-share="75" aria-pressed="false">75%</button></div></div>
+        </div>
+
+</section></div>
       </div>
 
       <div id="gpuInputs" class="tk-hidden">
@@ -481,31 +1175,19 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
           <div class="field">
             <div>
               <label for="gpuInstances">GPU instances</label>
-              <p>How many instances you keep running to cover your peak. The default of two is a minimal production setup with a spare for failover.</p>
+              <p>Number of instances in your fleet.</p>
             </div>
             <div class="field-controls"><input type="number" id="gpuInstances" min="0" step="1"></div>
           </div>
           <div class="field">
             <div>
-              <label for="gpuPricing">How you pay for the instances</label>
+              <label for="gpuPricing">Billing plan</label>
               <p id="gpuPriceNote"></p>
             </div>
-            <div class="field-controls"><select id="gpuPricing"></select></div>
+            <div class="field-controls"><div class="select-control"><select id="gpuPricing"></select></div></div>
           </div>
-          <div class="field">
-            <div>
-              <label for="gpuHourly">Hourly rate per instance (USD)</label>
-              <p>Enter your own effective rate if it's different.</p>
-            </div>
-            <div class="field-controls"><input type="number" id="gpuHourly" min="0" step="0.01"></div>
-          </div>
-          <div class="field">
-            <div>
-              <label for="gpuHours">Hours a month the fleet runs</label>
-              <p>730 means always on. Lower it if you scale the fleet down off-peak.</p>
-            </div>
-            <div class="field-controls"><input type="number" id="gpuHours" min="0" max="744" step="1"></div>
-          </div>
+
+
         </div>
 
         <h3 class="tk-subhead">Your traffic</h3>
@@ -513,7 +1195,7 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
           <div class="field">
             <div>
               <label for="reqMonth">Model requests a month</label>
-              <p>Every call your agents and apps make to the model.</p>
+              <p>Total calls to your model.</p>
             </div>
             <div class="field-controls"><input type="number" id="reqMonth" min="0" step="10000"></div>
           </div>
@@ -524,53 +1206,151 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
           <button type="button" class="tk-ghost-btn" data-req="10000000">10M/mo</button>
           <button type="button" class="tk-ghost-btn" data-req="50000000">50M/mo</button>
         </div>
-        <div class="input-stack">
+
+
+        <p class="source-line">Starting assumptions: Nova 2 Lite · 2,000 input / 400 output tokens.</p>
+        <details class="gpu-assumptions"><summary>Adjust assumptions</summary>
           <div class="field">
             <div>
+              <label for="gpuHourly">Hourly rate per instance (USD)</label>
+              <p>Use your contracted rate, if different.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="gpuHourly" min="0" step="0.01"></div>
+          </div>          <div class="field">
+            <div>
+              <label for="gpuHours">Billed hours per month</label>
+              <p>Reserved: 730 hours/month. Otherwise, enter billed hours.</p>
+            </div>
+            <div class="field-controls"><input type="number" id="gpuHours" min="0" max="744" step="1"></div>
+          </div>          <div class="field">
+            <div>
               <label for="inTok">Input tokens per request</label>
-              <p>Average prompt size: instructions, context, history, and tool definitions.</p>
+              <p>Average prompt size.</p>
             </div>
             <div class="field-controls"><input type="number" id="inTok" min="0" step="100"></div>
-          </div>
-          <div class="field">
+          </div>          <div class="field">
             <div>
               <label for="outTok">Output tokens per request</label>
               <p>Average response length.</p>
             </div>
             <div class="field-controls"><input type="number" id="outTok" min="0" step="50"></div>
-          </div>
-        </div>
-
-        <h3 class="tk-subhead">Serverless model price</h3>
+          </div>        <h3 class="tk-subhead">Serverless model price</h3>
         <div class="input-stack">
           <div class="field">
             <div>
               <label for="modelPreset">Model</label>
               <p id="priceNote"></p>
             </div>
-            <div class="field-controls"><select id="modelPreset"></select></div>
+            <div class="field-controls"><div class="select-control"><select id="modelPreset"></select></div></div>
           </div>
           <div class="field">
-            <div><label for="priceIn">Price per 1M input tokens (USD)</label></div>
+            <div><label for="priceIn">Input price / 1M tokens (USD)</label></div>
             <div class="field-controls"><input type="number" id="priceIn" min="0" step="0.01"></div>
           </div>
           <div class="field">
-            <div><label for="priceOut">Price per 1M output tokens (USD)</label></div>
+            <div><label for="priceOut">Output price / 1M tokens (USD)</label></div>
             <div class="field-controls"><input type="number" id="priceOut" min="0" step="0.01"></div>
           </div>
         </div>
+        </details>
       </div>
 
-      <p class="eyebrow section-heading spaced">Step 2</p>
-      <h2>Which levers fit your workload?</h2>
-      <p class="subhead" style="font-size:0.95rem; margin-bottom:1rem;">Each lever applies only to the slice of token spend you assign it, never your whole bill. Turn on the ones that match how your agents work today.</p>
+      <div class="step-actions"><span>Your numbers stay in this browser.</span><button class="primary-action" type="button" data-next-step="2">Choose your workload <span aria-hidden="true">→</span></button></div>
+      </section>
+      <section class="wizard-step" id="step2" data-step="2" aria-labelledby="workloadTitle" hidden>
+      <h2 id="workloadTitle" tabindex="-1">Your workload</h2>
+      <p class="subhead" style="font-size:0.95rem; margin-bottom:1rem;">Choose what fits your app, then review the settings below.</p>
       <p class="message tk-hidden" id="gpuLeverNote" style="margin-top:-0.3rem; font-size:0.86rem; font-weight:600;">These levers apply to the serverless bill from Step 1. On serverless you pay per token, so fewer tokens means a smaller bill. On a fixed GPU fleet, fewer tokens frees up capacity but doesn't change the invoice unless you shrink the fleet.</p>
+      <div class="workload-toolbar"><output id="workloadCount" aria-live="polite">No patterns selected</output><button type="button" class="tk-ghost-btn" id="selectWorkloads">Select all</button><button type="button" class="tk-ghost-btn" id="clearWorkloads">Clear selection</button></div>
       <div class="tool-groups" id="leverGroups"></div>
 
-      <p class="eyebrow section-heading spaced">Step 3</p>
-      <h2>Check the assumptions</h2>
-      <details class="advanced" id="ratesPanel" style="margin-top:0.4rem;">
-        <summary>Adjust reduction rates</summary>
+      <div class="step-actions"><button type="button" class="back-action" data-go-step="1">← Back</button><button class="primary-action" type="button" data-next-step="3">See your estimate <span aria-hidden="true">→</span></button></div>
+      </section>
+      <section class="wizard-step" id="step3" data-step="3" aria-labelledby="estimateTitle" hidden>
+      <h2 id="estimateTitle" tabindex="-1">Your estimated savings</h2>
+      <p class="step-description">Based on your spend and selected workload.</p>
+    <aside class="results-panel">
+      <div class="panel">
+
+        <div class="result-grid">
+          <div class="result-card primary">
+            <span id="savingsLabel">Potential annual savings</span>
+            <strong id="savingsValue" aria-live="polite">Turn on a lever to see an estimate</strong>
+            <p id="savingsPct"></p>
+          </div>
+          <div class="tk-compare tk-hidden" id="compareBlock" role="group" aria-labelledby="compareTitle">
+            <h3 id="compareTitle">Your annual model bill</h3>
+            <p class="tk-compare-sub">Compare today’s spend with your estimated model costs.</p>
+            <div class="tk-compare-row" data-row="today">
+              <div class="tk-compare-label"><span id="todayLabel">Today</span><strong id="todayValue"></strong></div>
+              <div class="tk-compare-track"><div class="tk-bar tk-bar-today" id="todayBar"></div></div>
+            </div>
+            <div class="tk-compare-row" data-row="after">
+              <div class="tk-compare-label"><span id="afterLabel">With the AI Data Plane&trade;</span><strong id="afterValue"></strong></div>
+              <div class="tk-compare-track"><div class="tk-bar tk-bar-after" id="afterBarLow"></div><div class="tk-bar-range" id="afterBarRange"></div></div>
+            </div>
+            <p class="tk-compare-foot" id="compareFoot"></p>
+
+          </div>
+
+        </div>
+
+        <div class="message warning tk-hidden" id="noSpendMsg">Enter your monthly spend in Step 1 to size these levers.</div>
+        <div class="message tk-hidden tk-reco" id="gpuCheaperMsg">
+          <strong>Your GPU fleet costs less</strong>
+          <span>A lower GPU bill requires resizing your fleet.</span>
+          <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Compare Model Service options</a>
+        </div>
+
+        <p class="estimate-note">Estimated model savings, before Couchbase and setup costs. <a href="methodology.html" target="_blank" rel="noopener">How it’s calculated</a><span class="tk-gpu-only tk-hidden"> Existing GPU commitments may still apply.</span></p>
+        <details class="comparison-details tk-gpu-only tk-hidden"><summary>Fleet costs and break-even</summary><div class="metric-grid">          <div class="result-card secondary-metric tk-gpu-only tk-hidden">
+            <span>Dedicated GPU fleet, per year</span>
+            <strong id="fleetEcho">Not set</strong>
+          </div>
+          <div class="result-card secondary-metric tk-gpu-only tk-hidden">
+            <span>Serverless, same traffic, per year</span>
+            <strong id="serverlessEcho">Not set</strong>
+          </div>
+          <div class="result-card secondary-metric" hidden>
+            <span>Levers on</span>
+            <strong id="leversCount">0 of 4</strong>
+          </div>
+          <div class="result-card secondary-metric tk-token-only" hidden>
+            <span>Annual token spend</span>
+            <strong id="spendEcho">Not set</strong>
+          </div>
+          <div class="result-card secondary-metric tk-gpu-only tk-hidden">
+            <span>Serverless costs less up to</span>
+            <strong id="breakEvenEcho">Not set</strong>
+            <small class="tk-card-note" id="breakEvenNote"></small>
+          </div></div></details>
+        <section hidden class="summary-box" id="breakdownBox" aria-labelledby="breakdownTitle"><h3 id="breakdownTitle">Cost breakdown</h3>
+          <table class="tk-breakdown-table" id="breakdownTable"></table>
+        </section>
+      </div>
+
+      <div id="selectedChips" hidden></div>
+      <div class="estimate-edits" role="group" aria-label="Edit your estimate">
+        <button type="button" data-go-step="1">Edit spend</button>
+        <button type="button" data-go-step="2">Edit workload</button>
+        <button type="button" id="editAssumptions">Edit assumptions</button>
+      </div>
+      <div class="hero-card" style="margin-top:1rem;">
+        <div class="next-step-copy"><p>Let’s review your results and find the right plan for your app.</p></div>
+        <div class="button-row" style="margin-bottom:0;">
+          <a class="primary-action" href="https://www.couchbase.com/contact/" target="_blank" rel="noopener" id="ctaPrimary">Talk to Couchbase</a>
+        </div>
+
+      </div>
+    </aside>
+
+      </section>
+    </main>
+  </div>
+
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle"><div class="dialog-heading"><h2 id="settingsTitle">Estimate settings</h2><button type="button" id="closeSettings" class="tk-ghost-btn">Done</button></div>      <section class="sources-panel" aria-labelledby="ratesTitle">
+      <div id="ratesPanel">
+        <h3 id="ratesTitle">Reduction assumptions</h3>
         <div style="margin-top:0.9rem;">
           <p class="source-line" style="margin:0 0 0.8rem; font-size:0.85rem;">Defaults come from the sources listed. If you've measured your own reduction, replace the default with it.</p>
           <table class="tk-rate-table" id="rateTable"></table>
@@ -578,199 +1358,17 @@ footer { padding: 0 4rem 2rem; color: var(--muted); text-align: center; }
             <button type="button" class="tk-ghost-btn" id="resetRates">Reset to sourced defaults</button>
           </div>
         </div>
-      </details>
-
-    </main>
-
-    <aside class="results-panel">
-      <div class="panel">
-        <h2 style="font-size:1.1rem;">Directional annual impact summary</h2>
-        <div class="result-grid">
-          <div class="result-card primary">
-            <span id="savingsLabel">Estimated annual token savings</span>
-            <strong id="savingsValue" aria-live="polite">Turn on a lever to see an estimate</strong>
-            <p id="savingsPct" style="color:rgba(255,255,255,0.85); margin-top:0.5rem; font-size:0.85rem; font-weight:600;"></p>
-          </div>
-          <div class="tk-compare tk-hidden" id="compareBlock" role="group" aria-labelledby="compareTitle">
-            <h3 id="compareTitle">Your annual model bill</h3>
-            <p class="tk-compare-sub">The lighter band shows the range of the estimate.</p>
-            <div class="tk-compare-row" data-row="today" tabindex="0">
-              <div class="tk-compare-label"><span id="todayLabel">Today</span><strong id="todayValue"></strong></div>
-              <div class="tk-compare-track"><div class="tk-bar tk-bar-today" id="todayBar"></div></div>
-            </div>
-            <div class="tk-compare-row" data-row="after" tabindex="0">
-              <div class="tk-compare-label"><span id="afterLabel">With the AI Data Plane&trade;</span><strong id="afterValue"></strong></div>
-              <div class="tk-compare-track"><div class="tk-bar tk-bar-after" id="afterBarLow"></div><div class="tk-bar-range" id="afterBarRange"></div></div>
-            </div>
-            <p class="tk-compare-foot" id="compareFoot"></p>
-            <div class="tk-tooltip" id="compareTip" role="tooltip" hidden></div>
-          </div>
-          <div class="result-card tk-gpu-only tk-hidden">
-            <span>Dedicated GPU fleet, per year</span>
-            <strong id="fleetEcho">Not set</strong>
-          </div>
-          <div class="result-card tk-gpu-only tk-hidden">
-            <span>Serverless, same traffic, per year</span>
-            <strong id="serverlessEcho">Not set</strong>
-          </div>
-          <div class="result-card">
-            <span>Levers on</span>
-            <strong id="leversCount">0 of 4</strong>
-          </div>
-          <div class="result-card tk-token-only">
-            <span>Annual token spend</span>
-            <strong id="spendEcho">Not set</strong>
-          </div>
-          <div class="result-card tk-gpu-only tk-hidden">
-            <span>Serverless costs less up to</span>
-            <strong id="breakEvenEcho">Not set</strong>
-            <small class="tk-card-note" id="breakEvenNote"></small>
-          </div>
-        </div>
-
-        <div class="message warning tk-hidden" id="noSpendMsg">Enter your monthly spend in Step 1 to size these levers.</div>
-        <div class="message tk-hidden tk-reco" id="gpuCheaperMsg">
-          <strong>The lower-cost AI Data Plane option at this traffic: provisioned GPUs</strong>
-          <span>At this volume, dedicated capacity costs less than paying per token. Capella Model Service offers that too: dedicated GPUs through NVIDIA NIM, billed by the node-hour. You keep a fixed, predictable fleet cost, and the levers in Step 2 still cut the tokens each request needs, so the same fleet can serve more traffic.</span>
-          <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Compare Model Service options</a>
-        </div>
-
-        <button type="button" id="toggleBreakdown" class="tk-ghost-btn" style="margin-top:1rem;" aria-expanded="false" aria-controls="breakdownBox">How we calculate this &#9662;</button>
-        <div class="summary-box" id="breakdownBox" style="display:none;">
-          <table class="tk-breakdown-table" id="breakdownTable"></table>
-        </div>
       </div>
 
-      <div class="summary-box">
-        <h3 style="font-size:0.95rem;">Levers on</h3>
-        <div id="selectedChips"><span class="tk-chip empty">None yet</span></div>
-      </div>
-
-      <div class="hero-card" style="margin-top:1rem;">
-        <p style="margin:0;"><strong style="color:#fff;">Want these numbers sized against your own traffic?</strong><br>A Couchbase architect can walk through model serving, caching, memory, retrieval, and tool design for your workload in a 30-minute session.</p>
-        <div class="button-row" style="margin-bottom:0;">
-          <a href="https://www.couchbase.com/contact/" target="_blank" rel="noopener" id="ctaPrimary"><button type="button" class="tk-invert-btn">Talk to an architect</button></a>
-        </div>
-        <div class="tk-cta-links">
-          <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Explore the AI Data Plane</a>
-          <a href="https://docs.couchbase.com/ai/get-started/intro.html" target="_blank" rel="noopener">Read the docs</a>
-          <a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener">Estimate database TCO</a>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <section class="wide-section">
-      <div class="faq-section" style="margin-top:0;">
-        <h2>Token savings estimator FAQ</h2>
-        <p class="subhead">How the estimator works and where the numbers come from.</p>
-        <div class="faq-grid">
-          <details class="faq-item">
-            <summary>Which Couchbase capabilities does this cover?</summary>
-            <p>Serverless models in Capella Model Service, billed by the token, plus four token levers from the Couchbase AI Data Plane&trade;: exact and semantic caching in Model Service, Agent Memory, Hybrid Search with the Vectorization Service, and Agent Catalog tool search. Each lever links to its documentation.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Where do the reduction rates come from?</summary>
-            <p>Caching ranges come from the traffic shape you pick and match the Couchbase Database TCO Calculator. The Agent Memory range is Couchbase's result on the standard LoCoMo benchmark. Retrieval and tool search use figures from published research on the same techniques, so they are not Couchbase benchmarks. Every source is listed in the methodology notes.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Why is the total smaller than the levers added up?</summary>
-            <p>The levers overlap. One request can miss the cache, carry agent memory, retrieve documents, and call tools all at once. The estimator combines the levers so each one only acts on the spend the others leave behind. The same tokens are never counted twice, and the total can never exceed your bill.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Why compare serverless with dedicated GPUs?</summary>
-            <p>A GPU fleet sized for your peak costs the same every hour, busy or idle. Serverless models in Capella Model Service bill per token through Amazon Bedrock, with nothing to pay while your deployment is idle. Token savings also depend on it: on a fixed fleet, sending fewer tokens frees capacity but doesn't change the invoice unless you shrink the fleet.</p>
-          </details>
-          <details class="faq-item">
-            <summary>When do dedicated GPUs cost less?</summary>
-            <p>When traffic is steady and high enough to keep the fleet busy most hours. The estimator shows that case plainly instead of hiding it. Capella Model Service offers both options: serverless models billed by the token, and provisioned GPUs billed by the node-hour.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Does this include the cost of running Couchbase?</summary>
-            <p>No. It estimates the model spend you could avoid. It does not net out Capella, embedding model, or Search Service costs, and semantic caching uses some compute of its own. It also leaves out the engineering time to run a GPU fleet. For infrastructure and staffing costs, use the <a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener" style="color:#fff;">Couchbase Database TCO Calculator</a>.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Does caching work with serverless models?</summary>
-            <p>Yes. Exact and semantic caching are available when you deploy serverless models in Capella Model Service. The cache is stored in a Capella operational cluster, and semantic caching needs an embedding model deployed alongside it.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Can I use my own numbers?</summary>
-            <p>Yes. Every input is editable, including GPU rates and model prices. Open "Adjust reduction rates" to replace any lever default with a rate you've measured. The estimate is only as good as those inputs.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Do I need to share my email?</summary>
-            <p>No. The estimate runs in your browser and nothing you enter is sent anywhere.</p>
-          </details>
-        </div>
-      </div>
-
-      <details class="advanced" style="margin-top:2rem;">
-        <summary>Methodology &amp; validation notes</summary>
-        <div class="input-stack" style="margin-top:0.9rem; font-size:0.88rem; color:var(--ink); display:block;">
-          <h3>Two starting points</h3>
-          <p>If you pay per token, the estimator starts from your current monthly token spend. If you run dedicated GPUs, it first prices the same traffic on a serverless model, then applies the levers to that serverless bill. Token savings only lower a bill that is charged per token.</p>
-
-          <h3>Serverless vs. dedicated GPUs</h3>
-          <p><code>dedicated GPUs per year = instances &times; hourly rate &times; hours per month &times; 12</code><br>
-          <code>serverless per year = requests per month &times; 12 &times; (input tokens &times; input price + output tokens &times; output price) &divide; 1,000,000</code><br>
-          <code>total savings = (dedicated &minus; serverless) + lever savings on the serverless bill</code></p>
-          <p>The default fleet is two g6e.12xlarge instances (4&times; NVIDIA L40S each) at the 1-year reserved rate for US East, running all month. The default traffic is a placeholder for you to replace. The break-even figure shows the monthly request volume at which serverless and the fleet cost the same, using only your inputs. Model prices are Amazon Bedrock on-demand list prices for US regions, checked <span data-prices-as-of></span>. Capella Model Service bills serverless models in Capella Credits, and credit consumption varies with then-current Amazon Bedrock rates, so check the rates shown when you deploy before relying on a figure. The comparison assumes the serverless model you pick meets your quality bar and that your fleet can serve the traffic you enter. It leaves out reserved-instance discounts unless you enter them in the hourly rate, and it leaves out the engineering time to run a fleet, which would widen the gap. When the fleet costs less, the estimator says so.</p>
-
-          <h3>Lever math</h3>
-          <p>Each lever you turn on removes part of your annual token spend: <code>annual spend &times; share of spend &times; reduction rate</code>. For caching, the share is the cache-eligible slice of traffic and the rate is the hit rate. Each lever card shows that lever on its own. The total combines them instead of adding them up: <code>annual spend &times; [1 &minus; (1 &minus; lever&nbsp;1) &times; (1 &minus; lever&nbsp;2) &times; &hellip;]</code>, where each lever term is its share &times; rate. In practice, each lever only acts on the spend the others leave behind, so tokens touched by more than one lever count once and the total can never exceed your bill. Low and high ends are calculated separately and shown as a range.</p>
-
-          <h3>Exact and semantic caching (Capella Model Service)</h3>
-          <p>A cache hit is a model call you don't pay for. Capella Model Service stores prompt-response pairs in a Capella operational cluster and matches new prompts by exact text or, with semantic caching, by meaning, so a paraphrased question can still hit. Caching is available for serverless models billed by the token. How often that happens depends on two properties of your traffic: how much of it is cache-eligible, and how often the cache hits within that slice. The four traffic shapes and their ranges match the Couchbase Database TCO Calculator.</p>
-          <ul class="tk-sources" id="archetypeList"></ul>
-
-          <h3>Agent Memory</h3>
-          <p>On the standard LoCoMo benchmark, Agent Memory cuts token usage by 33-45% compared to leading agent memory alternatives. The estimator applies that range to the share of spend you assign to multi-turn agent conversations. Your result depends on how your agents handle context today and on what they write to memory. Benchmark result as of <span data-as-of></span>.</p>
-          <p>Fewer tokens only help if answers stay accurate, so accuracy is worth checking too. On the same benchmark, Agent Memory scores 82.3% (LLM score). The Couchbase engineering team published its test setup and results, including the design trade-offs it made for accuracy, in <a href="https://www.couchbase.com/blog/what-we-learned-evaluating-agent-memorythe-results-part-2/" target="_blank" rel="noopener">What We Learned Evaluating Agent Memory</a>.</p>
-
-          <h3>Hybrid Search retrieval</h3>
-          <p>Published research (Li et al., EMNLP 2024) compared retrieval with long-context prompting across GPT-4o, GPT-3.5-Turbo, and Gemini-1.5-Pro. A retrieval-first approach used 38% to 61% of the long-context token count with comparable answer quality, a 39-62% reduction. Pure retrieval used even fewer tokens but gave up some accuracy, so the estimator uses the more conservative figure. Couchbase Hybrid Search and the Vectorization Service provide the retrieval layer. The figure is the paper's, not a Couchbase benchmark.</p>
-
-          <h3>Agent Catalog tool search</h3>
-          <p>RAG-MCP (2025) tested the pattern of retrieving only the relevant tools before the model sees the prompt. On an MCP stress test, average prompt tokens fell from 2,134 to 1,084 per query, about 49%, and tool-selection accuracy rose from 13.6% to 43.1%. Agent Catalog provides the same step through semantic search over your published tools and prompts. This is one study on one model, so treat it as a starting point and replace it with your own measurement when you have one.</p>
-
-          <h3>Ranges, not points</h3>
-          <p>Most levers show a low&ndash;high range because the source rates are ranges and because your spend has its own variance. Tighten the range by setting share of spend and reduction rates to what you know about your workload.</p>
-
-          <h3>What this tool is not</h3>
-          <p>For per-token spend, it is a top-down estimate against your current bill, not a bottom-up token model. For a GPU fleet there is no token bill to start from, so it prices your traffic bottom-up from the requests and token counts you enter. Either way it is meant to start a discovery conversation, not replace one. It does not include the cost of Couchbase products, other infrastructure, or staff time.</p>
-
-          <h3>Sources</h3>
-          <ul class="tk-sources">
-            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/model-service/configure-value-adds.html" target="_blank" rel="noopener">Configure LLM Value Adds</a> (Model Service caching)</li>
-            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/agent-memory/about-agent-mem.html" target="_blank" rel="noopener">Agent Memory</a></li>
-            <li>Couchbase Blog, <a href="https://www.couchbase.com/blog/what-we-learned-evaluating-agent-memorythe-results-part-2/" target="_blank" rel="noopener">What We Learned Evaluating Agent Memory: The Results (Part 2)</a>, July 2026 (LoCoMo accuracy)</li>
-            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/vectorization-service/data-processing.html" target="_blank" rel="noopener">Vectorization Service</a></li>
-            <li>Couchbase docs, <a href="https://docs.couchbase.com/ai/build/integrate-agent-with-catalog.html" target="_blank" rel="noopener">Integrate an Agent with the Agent Catalog</a></li>
-            <li>Li et al., <a href="https://arxiv.org/abs/2407.16833" target="_blank" rel="noopener">Retrieval Augmented Generation or Long-Context LLMs? A Comprehensive Study and Hybrid Approach</a>, EMNLP 2024 Industry Track, Table 1</li>
-            <li><a href="https://arxiv.org/abs/2505.03275" target="_blank" rel="noopener">RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation</a>, arXiv 2505.03275, 2025, Table 1</li>
-            <li><a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener">Couchbase Database TCO Calculator</a> (caching traffic shapes)</li>
-            <li><a href="https://aws.amazon.com/bedrock/pricing/" target="_blank" rel="noopener">Amazon Bedrock pricing</a> (serverless model list prices)</li>
-            <li><a href="https://aws.amazon.com/ec2/pricing/on-demand/" target="_blank" rel="noopener">Amazon EC2 On-Demand pricing</a> (g6e.12xlarge default rate)</li>
-          </ul>
-        </div>
-      </details>
-
-      <details class="advanced" style="margin-top:1rem;">
-        <summary>Disclaimer</summary>
-        <div class="input-stack" style="margin-top:0.9rem; font-size:0.88rem; color:var(--ink); display:block;">
-          <p><strong>Disclaimer.</strong> This tool provides directional, illustrative estimates only and is not a quote, offer, or guarantee of savings, pricing, or performance. It is intended to support evaluation and discovery conversations, not as the sole basis for a purchasing decision.</p>
-          <p>The Agent Memory range reflects Couchbase results on the standard LoCoMo benchmark as of <span data-as-of></span>. Retrieval and tool search figures come from third-party published research and were not produced by Couchbase. Caching ranges are workload assumptions. GPU rates and model prices are list prices that change over time, and Capella Credit consumption for serverless models varies with then-current Amazon Bedrock rates. Actual savings depend on your workload, data, model choices, and agent behavior, and may differ materially from the estimates shown. Estimates do not include the cost of Couchbase products or other infrastructure. This tool does not constitute financial, legal, procurement, or professional advice. Couchbase makes no warranty, express or implied, as to the accuracy or completeness of the information provided and disclaims liability for decisions made in reliance on it.</p>
-        </div>
-      </details>
-  </section>
-
-  <footer>
-    Couchbase AI Data Plane Token Savings Estimator. Figures are estimates for discussion purposes and are not a binding quote.
-    <p style="font-size:0.72rem; color:var(--muted); line-height:1.5; margin-top:0.75rem;">
-      Couchbase&reg; is a registered trademark of Couchbase, Inc. All other trademarks are the property of their respective
-      owners. Use of these marks does not imply any sponsorship, endorsement, or affiliation between Couchbase and the
-      respective trademark owners.
-    </p>
+<p class="source-line">Combined savings assume multiplicative overlap. Real effects can overlap more or less. GPU comparisons assume equivalent model quality and sufficient fleet capacity.</p></section>
+</dialog>
+  <footer class="site-footer">
+    <div class="footer-top"><div class="footer-identity"><img class="brand-logo" src="assets/couchbase-logo.svg" alt="Couchbase" width="154" height="32"><p>Powered by <a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">Couchbase AI Data Plane</a></p></div>
+    <nav aria-label="Couchbase resources" class="footer-resources">
+      <div><h2>Explore</h2><a href="https://www.couchbase.com/products/ai-data-plane/" target="_blank" rel="noopener">AI Data Plane</a><a href="https://www.couchbase.com/database-tco-calculator/" target="_blank" rel="noopener">Database TCO calculator</a></div>
+      <div><h2>Learn</h2><a href="https://docs.couchbase.com/ai/get-started/intro.html" target="_blank" rel="noopener">Documentation</a><a href="methodology.html" target="_blank" rel="noopener">Methodology &amp; sources</a></div>
+      <div><h2>Connect</h2><a href="https://www.couchbase.com/contact/" target="_blank" rel="noopener">Talk to Couchbase</a><a href="https://www.couchbase.com/pricing/" target="_blank" rel="noopener">Pricing</a></div>
+    </nav></div><div class="footer-legal">Couchbase® AI savings demo. Estimates only; not a quote. <a href="methodology.html" target="_blank" rel="noopener">Assumptions and limitations</a></div>
   </footer>
 
 <script>
@@ -805,8 +1403,8 @@ const GPU_DEFAULTS = { instances: 2, hours: 730, pricing: 'reserved1' };
    TODO(confirm): re-check against aws.amazon.com/ec2/pricing before launch. */
 const GPU_RATE_PRESETS = {
   ondemand:  { label: 'On-demand',            rate: 10.49 },
-  reserved1: { label: '1-yr reserved',        rate: 6.61 },
-  reserved3: { label: '3-yr reserved',        rate: 4.53 },
+  reserved1: { label: '1-year reserved',        rate: 6.61 },
+  reserved3: { label: '3-year reserved',        rate: 4.53 },
   custom:    { label: 'Custom rate' },
 };
 
@@ -829,20 +1427,22 @@ const DEFAULT_MODEL = 'nova2Lite';
 const LEVERS = [
   {
     id: 'caching',
+    shortName: 'Repeated questions',
     name: 'Exact and semantic caching',
     product: 'Capella Model Service',
     type: 'archetype',
-    blurb: 'Repeated and paraphrased prompts are answered from cache without a new model call.',
+    blurb: 'Reuse saved answers to similar questions.',
     sourceTag: 'rate set by your traffic shape',
     source: 'Capella Model Service stores prompt-response pairs in a Capella operational cluster and matches new prompts by exact text or by meaning (semantic caching, which needs an embedding model). It works with serverless models billed by the token. A cache hit is a model call you don\'t pay for. How often that happens depends on how repetitive your traffic is, so pick the closest shape. These ranges match the Couchbase Database TCO Calculator. <a href="https://docs.couchbase.com/ai/build/model-service/configure-value-adds.html" target="_blank" rel="noopener">Model Service caching docs</a>',
   },
   {
     id: 'agentMemory',
+    shortName: 'Long conversations',
     name: 'Agent Memory',
     product: 'Agent Memory',
     type: 'share',
-    blurb: 'Agents recall the memories that matter for each turn instead of resending the whole conversation.',
-    shareLabel: '% of spend on multi-turn agent conversations',
+    blurb: 'Keep useful context without resending the full chat.',
+    shareLabel: 'Input spend on conversations (%)',
     shareDefault: 25,
     rateLow: 0.33, rateHigh: 0.45,
     sourceTag: 'LoCoMo benchmark',
@@ -853,11 +1453,12 @@ const LEVERS = [
   },
   {
     id: 'retrieval',
+    shortName: 'Large documents',
     name: 'Hybrid Search retrieval',
     product: 'Hybrid Search + Vectorization Service',
     type: 'share',
-    blurb: 'Prompts carry the passages that answer the question instead of whole documents.',
-    shareLabel: '% of spend on document-heavy or long-context prompts',
+    blurb: 'Send relevant passages instead of entire documents.',
+    shareLabel: 'Input spend on document prompts (%)',
     shareDefault: 30,
     rateLow: 0.39, rateHigh: 0.62,
     sourceTag: 'published research',
@@ -866,11 +1467,12 @@ const LEVERS = [
   },
   {
     id: 'toolSearch',
+    shortName: 'Long tool lists',
     name: 'Agent Catalog tool search',
     product: 'Agent Catalog',
     type: 'share',
-    blurb: 'Agents search the catalog for the tools a request needs instead of sending every tool definition on every call.',
-    shareLabel: '% of spend on agent calls that send tool definitions',
+    blurb: 'Send only the tool descriptions a request needs.',
+    shareLabel: 'Input spend on calls with tools (%)',
     shareDefault: 15,
     rateLow: 0.49, rateHigh: 0.49,
     sourceTag: 'published research',
@@ -885,6 +1487,7 @@ const LEVERS = [
 const state = {
   mode: 'token',   // 'token' = pays per token today, 'gpu' = runs dedicated GPUs today
   monthlySpend: 20000,
+  inputSpendShare: 50, // Illustrative input-cost allocation, editable by the visitor.
   enabled: new Set(),
   shares: {},   // leverId -> % (0-100)
   rates: {},    // leverId -> { low, high } as fractions
@@ -908,16 +1511,28 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 function fmtUSD(n){ return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }); }
 function pct(f){ return `${Math.round(f * 100)}%`; }
 function fmtRange(lo, hi, f){ return Math.round(lo) === Math.round(hi) ? f(lo) : `${f(lo)} – ${f(hi)}`; }
-function rateLabel(r){ return Math.round(r.low * 100) === Math.round(r.high * 100) ? pct(r.low) : `${Math.round(r.low * 100)}–${pct(r.high)}`; }
-const nz = v => Math.max(0, Number(v) || 0);
+function rateLabel(r, precise = false){
+  const format = v => precise ? String(Number((v * 100).toFixed(8))) : String(Math.round(v * 100));
+  return format(r.low) === format(r.high) ? `${format(r.low)}%` : `${format(r.low)}–${format(r.high)}%`;
+}
+const nz = v => Number.isFinite(Number(v)) ? clamp(Number(v), 0, 1e12) : 0;
 
 /* Dedicated GPU fleet cost per year. */
-function fleetAnnual(){ return nz(state.gpu.instances) * nz(state.gpu.hourly) * nz(state.gpu.hours) * 12; }
+function billedHours(){ return ['reserved1','reserved3'].includes(state.gpuPricing) ? 730 : nz(state.gpu.hours); }
+function fleetAnnual(){ return nz(state.gpu.instances) * nz(state.gpu.hourly) * billedHours() * 12; }
 
 /* The same traffic priced on a serverless model, per year. */
 function serverlessAnnual(){
   const t = state.traffic, p = state.price;
   return nz(t.requests) * 12 * (nz(t.inTok) * nz(p.in) + nz(t.outTok) * nz(p.out)) / 1e6;
+}
+
+/* Prompt reductions only remove input charges. Caching can avoid the entire call. */
+function inputSpendFraction(){
+  if(state.mode !== 'gpu') return clamp(nz(state.inputSpendShare), 0, 100) / 100;
+  const input = nz(state.traffic.inTok) * nz(state.price.in);
+  const output = nz(state.traffic.outTok) * nz(state.price.out);
+  return input + output > 0 ? input / (input + output) : 0;
 }
 
 /* The per-token bill the levers act on: current spend, or the serverless bill on the GPU path. */
@@ -940,28 +1555,32 @@ function leverFraction(l){
   return {
     low: share * lo,
     high: share * hi,
-    detail: `${pct(share)} of spend × ${rateLabel({ low: lo, high: hi })}${isCustom(l) ? ' custom rate' : ''}`,
+    detail: `${pct(share)} of input spend × ${rateLabel({ low: lo, high: hi }, true)}${isCustom(l) ? ' custom rate' : ''}`,
   };
 }
 
-/* Each row is a lever's estimate on its own. The total combines levers instead of adding them:
-   total = annual x [1 - (1 - f1)(1 - f2)...], so each lever only acts on the spend the others
-   leave behind. Overlapping tokens are counted once and the total can never exceed annual spend.
-   The result does not depend on lever order. */
+/* Combine prompt reductions on input costs only. Caching affects both input and
+   output. This retains the shared input-cost overlap rather than treating output
+   charges as reducible by prompt-only features. */
 function computeTotal(){
-  const annual = annualSpend();
-  let keepLow = 1, keepHigh = 1, sumLow = 0, sumHigh = 0;
+  const annual = annualSpend(), inputShare = inputSpendFraction();
+  let keepLow = 1, keepHigh = 1, outputKeepLow = 1, outputKeepHigh = 1;
+  let sumLow = 0, sumHigh = 0;
   const rows = [];
   LEVERS.forEach(l => {
     if(!state.enabled.has(l.id)) return;
-    const f = leverFraction(l);
+    const f = leverFraction(l), caching = l.type === 'archetype';
     keepLow *= (1 - f.low); keepHigh *= (1 - f.high);
-    const row = { lever: l, low: annual * f.low, high: annual * f.high, detail: f.detail };
+    if(caching){ outputKeepLow *= (1 - f.low); outputKeepHigh *= (1 - f.high); }
+    const costShare = caching ? 1 : inputShare;
+    const row = { lever: l, low: annual * costShare * f.low, high: annual * costShare * f.high, detail: f.detail };
     sumLow += row.low; sumHigh += row.high;
     rows.push(row);
   });
-  const low = annual * (1 - keepLow), high = annual * (1 - keepHigh);
-  return { rows, low, high, lowFrac: 1 - keepLow, highFrac: 1 - keepHigh, overlapLow: sumLow - low, overlapHigh: sumHigh - high, n: rows.length, annual };
+  const lowFrac = inputShare * (1 - keepLow) + (1 - inputShare) * (1 - outputKeepLow);
+  const highFrac = inputShare * (1 - keepHigh) + (1 - inputShare) * (1 - outputKeepHigh);
+  const low = annual * lowFrac, high = annual * highFrac;
+  return { rows, low, high, lowFrac, highFrac, overlapLow: sumLow - low, overlapHigh: sumHigh - high, n: rows.length, annual };
 }
 
 /* ============================================================
@@ -989,25 +1608,29 @@ function buildLeverGroups(){
         <p class="source-line" id="archetypeBlurb">${(ARCHETYPES[state.archetype] || ARCHETYPES.unknown).blurb}</p>`;
     } else {
       controlsHTML = `
-        <div class="row">
+        <div class="share-editor">
           <label for="share-${l.id}">${l.shareLabel}</label>
-          <output for="share-${l.id}" data-share-out="${l.id}">${state.shares[l.id]}%</output>
-        </div>
-        <input type="range" id="share-${l.id}" min="0" max="100" step="1" value="${state.shares[l.id]}" data-share-input="${l.id}">`;
+          <p id="share-help-${l.id}">Estimate the share of your prompt costs. You can adjust it later.</p>
+          <div class="share-options">
+            <input type="number" id="share-${l.id}" min="0" max="100" step="1" value="${state.shares[l.id]}" data-share-input="${l.id}" aria-describedby="share-help-${l.id}">
+            ${[25,50,75].map(value=>`<button type="button" data-share-preset="${l.id}" data-value="${value}" aria-label="Set ${l.shortName.toLowerCase()} input spend to ${value} percent" aria-pressed="${state.shares[l.id]===value}">${value}%</button>`).join('')}
+          </div>
+        </div>`;
     }
     return `
       <div class="tool-group" data-lever="${l.id}">
         <label class="check-card" style="align-items:center;">
           <input type="checkbox" data-lever-toggle="${l.id}" ${state.enabled.has(l.id) ? 'checked' : ''}>
           <span style="display:block;">
-            <span>${i + 1}. ${l.name}<span class="tk-tip" tabindex="0" role="button" aria-label="Source and details for ${l.name}">&#9432;<span class="tk-tip-bubble">${l.source}</span></span> <span class="tk-badge" data-badge="${l.id}">${badgeText(l)}</span></span>
+            <span class="workload-name">${l.shortName || l.name}</span>
             <small>${l.blurb}</small>
           </span>
         </label>
         <div class="tk-lever-controls ${state.enabled.has(l.id) ? '' : 'tk-hidden'}" data-lever-controls="${l.id}">
           ${controlsHTML}
-          <div class="tk-lever-savings" data-lever-savings="${l.id}" aria-live="polite"></div>
+          <div class="tk-lever-savings" data-lever-savings="${l.id}" hidden></div>
         </div>
+
       </div>`;
   }).join('');
 
@@ -1023,11 +1646,17 @@ function buildLeverGroups(){
   wrap.querySelectorAll('[data-share-input]').forEach(inp => {
     inp.addEventListener('input', () => {
       const id = inp.dataset.shareInput;
-      state.shares[id] = parseInt(inp.value, 10) || 0;
-      wrap.querySelector(`[data-share-out="${id}"]`).textContent = `${state.shares[id]}%`;
+      state.shares[id] = clamp(Number(inp.value) || 0,0,100);
       render();
     });
   });
+
+  wrap.querySelectorAll('[data-share-preset]').forEach(button=>button.addEventListener('click',()=>{
+    const id=button.dataset.sharePreset;
+    state.shares[id]=Number(button.dataset.value);
+    wrap.querySelector(`[data-share-input="${id}"]`).value=button.dataset.value;
+    render();
+  }));
 
   wrap.querySelectorAll('input[name="archetype"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -1062,19 +1691,17 @@ function buildRateTable(){
     }
     const r = state.rates[l.id];
     return `<tr>
-      <td>${l.name}<span class="src">Default ${rateLabel({ low: l.rateLow, high: l.rateHigh })} · ${l.rateSource}</span>${isCustom(l) ? ' <span class="tk-custom-flag">custom</span>' : ''}</td>
-      <td><label class="sr-only" for="rateLow-${l.id}">${l.name} low rate (%)</label><input type="number" min="0" max="100" step="1" id="rateLow-${l.id}" data-rate="${l.id}" data-end="low" value="${Math.round(r.low * 100)}"></td>
-      <td><label class="sr-only" for="rateHigh-${l.id}">${l.name} high rate (%)</label><input type="number" min="0" max="100" step="1" id="rateHigh-${l.id}" data-rate="${l.id}" data-end="high" value="${Math.round(r.high * 100)}"></td>
+      <td>${l.name}<span class="src">Default ${rateLabel({ low: l.rateLow, high: l.rateHigh })} · ${l.rateSource}</span><span class="tk-custom-flag" data-custom-rate="${l.id}" ${isCustom(l) ? '' : 'hidden'}> custom</span></td>
+      <td><label class="sr-only" for="rateLow-${l.id}">${l.name} low rate (%)</label><input type="number" min="0" max="100" step="any" id="rateLow-${l.id}" data-rate="${l.id}" data-end="low" value="${Number((r.low * 100).toFixed(8))}"></td>
+      <td><label class="sr-only" for="rateHigh-${l.id}">${l.name} high rate (%)</label><input type="number" min="0" max="100" step="any" id="rateHigh-${l.id}" data-rate="${l.id}" data-end="high" value="${Number((r.high * 100).toFixed(8))}"></td>
     </tr>`;
   }).join('');
   t.innerHTML = `<thead><tr><th>Lever</th><th>Low %</th><th>High %</th></tr></thead><tbody>${rows}</tbody>`;
   t.querySelectorAll('[data-rate]').forEach(inp => {
-    inp.addEventListener('change', () => {
+    inp.addEventListener('input', () => {
       const id = inp.dataset.rate, end = inp.dataset.end;
       const v = clamp(parseFloat(inp.value) || 0, 0, 100);
-      inp.value = v;
       state.rates[id][end] = v / 100;
-      buildRateTable();
       render();
     });
   });
@@ -1083,9 +1710,10 @@ function buildRateTable(){
 /* Monthly requests at which serverless costs the same as the fleet. Uses only the visitor's inputs. */
 function breakEvenRequests(){
   const perReq = (nz(state.traffic.inTok) * nz(state.price.in) + nz(state.traffic.outTok) * nz(state.price.out)) / 1e6;
-  return perReq > 0 ? fleetAnnual() / 12 / perReq : 0;
+  return perReq > 0 ? fleetAnnual() / 12 / perReq : Infinity;
 }
 function fmtCount(n){
+  if(!Number.isFinite(n)) return 'no finite break-even';
   if(n >= 1e6){ const m = n / 1e6; return m >= 9.95 ? `${Math.round(m)}M` : `${m.toFixed(1)}M`; }
   if(n >= 1e3) return `${Math.round(n / 1e3)}K`;
   return `${Math.round(n)}`;
@@ -1093,60 +1721,78 @@ function fmtCount(n){
 function fmtMultiple(x){ return x >= 10 ? `${Math.round(x).toLocaleString('en-US')}×` : `${x.toFixed(1)}×`; }
 
 function render(){
+  syncSelectMenus();
+  document.querySelectorAll('[data-share-preset]').forEach(button=>{
+    const input=document.querySelector(`[data-share-input="${button.dataset.sharePreset}"]`);
+    button.setAttribute('aria-pressed',String(input.value!=='' && Number(input.value)===Number(button.dataset.value)));
+  });
+  const art=document.querySelector('.custom-art');
+  art.classList.toggle('has-selection',state.enabled.size>0);
+  art.querySelectorAll('[data-art-lever]').forEach(shape=>shape.classList.toggle('is-active',state.enabled.has(shape.dataset.artLever)));
+  document.querySelectorAll('[data-spend]').forEach(b=>b.setAttribute('aria-pressed',String(document.getElementById('monthlySpend').value !== '' && Number(b.dataset.spend)===Number(document.getElementById('monthlySpend').value))));
+  document.querySelectorAll('[data-req]').forEach(b=>b.setAttribute('aria-pressed',String(document.getElementById('reqMonth').value !== '' && Number(b.dataset.req)===Number(document.getElementById('reqMonth').value))));
+  document.querySelectorAll('[data-input-share]').forEach(b=>b.setAttribute('aria-pressed',String(document.getElementById('inputSpendShare').value !== '' && Number(b.dataset.inputShare)===Number(document.getElementById('inputSpendShare').value))));
+  document.getElementById('workloadCount').textContent=`${state.enabled.size} of ${LEVERS.length} patterns selected`;
+  document.getElementById('selectWorkloads').disabled=state.enabled.size===LEVERS.length;
+  document.getElementById('clearWorkloads').disabled=state.enabled.size===0;
   const gpu = state.mode === 'gpu';
   const r = computeTotal();
   const R = fleetAnnual(), S = serverlessAnnual(), D = R - S;
-  const ready = gpu ? (R > 0 && S > 0) : r.annual > 0;
+  const ready = validateInputs(false);
   const spend = ready ? r.annual / 12 : 0;   // monthly per-token bill the levers act on
 
   document.querySelectorAll('.tk-gpu-only').forEach(el => el.classList.toggle('tk-hidden', !gpu));
   document.querySelectorAll('.tk-token-only').forEach(el => el.classList.toggle('tk-hidden', gpu));
-  document.getElementById('spendEcho').textContent = r.annual > 0 ? fmtUSD(r.annual) : 'Not set';
-  document.getElementById('fleetEcho').textContent = R > 0 ? fmtUSD(R) : 'Not set';
-  document.getElementById('serverlessEcho').textContent = S > 0 ? fmtUSD(S) : 'Not set';
+  document.getElementById('spendEcho').textContent = fmtUSD(r.annual);
+  document.getElementById('fleetEcho').textContent = fmtUSD(R);
+  document.getElementById('serverlessEcho').textContent = fmtUSD(S);
   const be = breakEvenRequests();
-  document.getElementById('breakEvenEcho').textContent = be > 0 ? `${fmtCount(be)} requests/mo` : 'Not set';
+  document.getElementById('breakEvenEcho').textContent = Number.isFinite(be) ? `${fmtCount(be)} requests/mo` : 'No finite break-even';
   /* With levers on, each request costs less on serverless, so the crossover moves out. */
   const beLo = be / (1 - r.lowFrac), beHi = be / (1 - r.highFrac);
   document.getElementById('breakEvenNote').textContent = (be > 0 && r.n > 0)
-    ? `Before the levers. With them on: ${fmtCount(beLo) === fmtCount(beHi) ? fmtCount(beLo) : `${fmtCount(beLo)}–${fmtCount(beHi)}`}`
+    ? `Before the levers. With them on: ${r.lowFrac >= 1 ? 'no finite break-even' : r.highFrac >= 1 ? `from ${fmtCount(beLo)} requests/mo to no finite break-even` : fmtCount(beLo) === fmtCount(beHi) ? `${fmtCount(beLo)} requests/mo` : `${fmtCount(beLo)}–${fmtCount(beHi)} requests/mo`}`
     : '';
   const noSpend = document.getElementById('noSpendMsg');
-  noSpend.textContent = gpu ? 'Enter your GPU fleet and traffic in Step 1 to compare.' : 'Enter your monthly spend in Step 1 to size these levers.';
+  noSpend.textContent = gpu ? 'Correct the highlighted inputs to compare fleet and serverless costs.' : 'Correct the highlighted inputs to estimate savings.';
   noSpend.classList.toggle('tk-hidden', ready);
   /* Recommend provisioned GPUs only when the fleet stays cheaper even at the best lever case. */
-  document.getElementById('gpuCheaperMsg').classList.toggle('tk-hidden', !(gpu && ready && D + r.high <= 0));
+  document.getElementById('gpuCheaperMsg').classList.toggle('tk-hidden', !(gpu && ready && D + r.high < -0.005));
   document.getElementById('leversCount').textContent = `${r.n} of ${LEVERS.length}`;
-  document.getElementById('savingsLabel').textContent = gpu ? 'Estimated annual savings' : 'Estimated annual token savings';
+  document.getElementById('savingsLabel').textContent = 'Potential yearly savings';
+  document.querySelector('.result-grid').classList.toggle('gpu-result',gpu);
 
   const savingsEl = document.getElementById('savingsValue');
   const savingsPctEl = document.getElementById('savingsPct');
-  const leverPart = r.n ? fmtRange(r.low, r.high, fmtUSD) : '';
   if(gpu){
     if(!ready){
-      savingsEl.textContent = 'Enter your fleet and traffic to compare';
+      savingsEl.textContent = 'Check your inputs';
       savingsPctEl.textContent = '';
     } else {
       const lo = D + r.low, hi = D + r.high;
-      if(hi <= 0){
-        savingsEl.textContent = 'No serverless savings at this traffic';
+      if(Math.abs(lo) < 0.005 && Math.abs(hi) < 0.005){
+        savingsEl.textContent = 'Same annual model cost';
+      } else if(hi <= 0){
+        savingsEl.textContent = 'No estimated savings';
       } else if(lo < 0){
         savingsEl.textContent = `Up to ${fmtUSD(hi)}`;
       } else {
         savingsEl.textContent = fmtRange(lo, hi, fmtUSD);
       }
-      savingsPctEl.textContent = hi <= 0
-        ? `Serverless would cost ${fmtRange(-hi, -lo, fmtUSD)} more a year than your fleet${r.n ? ', even with the levers' : ''}. Dedicated capacity is the better fit here, and Capella Model Service offers it as provisioned GPUs (details below).`
-        : D > 0
-          ? `per year: ${fmtUSD(D)} from moving this traffic to serverless${r.n ? `, plus ${leverPart} from the levers below` : ''}.`
-          : `per year. Before the levers, serverless costs ${fmtUSD(-D)} more than the fleet for this traffic${r.n ? `, and the levers below save ${leverPart} on the serverless bill` : ''}.`;
+      savingsPctEl.textContent = Math.abs(lo) < 0.005 && Math.abs(hi) < 0.005
+        ? 'No modeled cost difference.'
+        : hi <= 0
+          ? `Serverless costs ${fmtRange(-hi, -lo, fmtUSD)} more per year.`
+          : lo < 0
+            ? 'Savings depend on your workload results.'
+            : 'Compared with your current GPU fleet.';
     }
   } else if(r.n === 0 || !ready){
-    savingsEl.textContent = 'Turn on a lever to see an estimate';
-    savingsPctEl.textContent = '';
+    savingsEl.textContent = ready && unlockedStep===3 ? '$0' : 'Select a workload to see your estimate.';
+    savingsPctEl.textContent = ready && unlockedStep===3 ? 'No workload changes selected; your modeled spend stays the same.' : '';
   } else {
     savingsEl.textContent = fmtRange(r.low, r.high, fmtUSD);
-    savingsPctEl.textContent = `per year, or ${rateLabel({ low: r.low / r.annual, high: r.high / r.annual })} of your annual token spend.`;
+    savingsPctEl.textContent = `per year, or ${rateLabel({ low: r.annual ? r.low / r.annual : 0, high: r.annual ? r.high / r.annual : 0 })} of your annual token spend.`;
   }
 
   document.getElementById('selectedChips').innerHTML = r.n === 0
@@ -1154,6 +1800,8 @@ function render(){
     : r.rows.map(row => `<span class="tk-chip">${row.lever.name}</span>`).join('');
 
   LEVERS.forEach(l => {
+    const customFlag = document.querySelector(`[data-custom-rate="${l.id}"]`);
+    if(customFlag) customFlag.hidden = !isCustom(l);
     const badge = document.querySelector(`[data-badge="${l.id}"]`);
     if(badge) badge.textContent = badgeText(l);
     const el = document.querySelector(`[data-lever-savings="${l.id}"]`);
@@ -1168,10 +1816,10 @@ function render(){
   const bt = document.getElementById('breakdownTable');
   const leverRows = () => {
     let html = r.rows.map(row => `<tr><td>${row.lever.name} (${row.detail})</td><td>${fmtRange(row.low, row.high, fmtUSD)}/yr</td></tr>`).join('');
-    if(r.n > 1) html += `<tr><td>Less overlap between levers</td><td>${fmtRange(r.overlapLow, r.overlapHigh, v => '−' + fmtUSD(v))}/yr</td></tr>`;
+    if(r.n > 1) html += `<tr><td>Modeled overlap adjustment</td><td>${fmtRange(r.overlapLow, r.overlapHigh, v => '−' + fmtUSD(v))}/yr</td></tr>`;
     return html;
   };
-  const combineNote = 'The levers are combined rather than added, so tokens that more than one lever touches are counted once.';
+  const combineNote = 'Reductions are combined using a multiplicative overlap assumption. Actual overlap must be measured on your workload.';
   if(gpu){
     if(!ready){
       bt.innerHTML = `<tr><td colspan="2">Enter your GPU fleet and traffic in Step 1 to see the breakdown.</td></tr>`;
@@ -1179,10 +1827,10 @@ function render(){
       const g = state.gpu, t = state.traffic;
       const modelName = (MODEL_PRESETS[state.model] || MODEL_PRESETS.custom).full;
       const rateName = (GPU_RATE_PRESETS[state.gpuPricing] || GPU_RATE_PRESETS.custom).label.toLowerCase();
-      let html = `<tr><td>Dedicated GPU fleet (${nz(g.instances)} × ${fmtUSD2(nz(g.hourly))}/hr ${rateName} × ${nz(g.hours)} hrs/mo × 12)</td><td>${fmtUSD(R)}/yr</td></tr>`;
+      let html = `<tr><td>Dedicated GPU fleet (${nz(g.instances)} × ${fmtUSD2(nz(g.hourly))}/hr ${rateName} × ${billedHours()} billed hrs/mo × 12)</td><td>${fmtUSD(R)}/yr</td></tr>`;
       html += `<tr><td>Serverless, same traffic (${nz(t.requests).toLocaleString('en-US')} requests/mo × ${nz(t.inTok).toLocaleString('en-US')} in + ${nz(t.outTok).toLocaleString('en-US')} out tokens, ${modelName})</td><td>−${fmtUSD(S)}/yr</td></tr>`;
       html += `<tr><td><strong>${D >= 0 ? 'Savings from moving to serverless' : 'Extra cost of serverless'}</strong></td><td><strong>${fmtUSD(Math.abs(D))}/yr</strong></td></tr>`;
-      html += `<tr><td colspan="2" style="text-align:left; color:var(--muted);">The fleet costs ${fmtMultiple(R / S)} what serverless would for this traffic. Serverless stays cheaper up to about ${fmtCount(breakEvenRequests())} requests a month at these token counts and prices.</td></tr>`;
+      html += `<tr><td colspan="2" style="text-align:left; color:var(--muted);">${S > 0 ? `The fleet costs ${fmtMultiple(R / S)} what serverless would for this traffic.` : 'The serverless bill is zero at these inputs.'} ${Number.isFinite(breakEvenRequests()) ? `The pre-reduction cost crossover is about ${fmtCount(breakEvenRequests())} requests a month.` : 'There is no finite cost crossover at these token prices.'}</td></tr>`;
       if(r.n){
         html += `<tr><td colspan="2" style="color:var(--muted); padding-top:0.7rem; text-align:left;">Levers, applied to the serverless bill:</td></tr>`;
         html += leverRows();
@@ -1195,10 +1843,20 @@ function render(){
     bt.innerHTML = `<tr><td colspan="2">Enter your spend and turn on a lever to see the breakdown.</td></tr>`;
   } else {
     let html = leverRows();
-    html += `<tr><td><strong>Estimated annual token savings</strong></td><td><strong>${fmtRange(r.low, r.high, fmtUSD)}/yr</strong></td></tr>`;
+    html += `<tr><td><strong>Potential annual savings</strong></td><td><strong>${fmtRange(r.low, r.high, fmtUSD)}/yr</strong></td></tr>`;
     html += `<tr><td colspan="2"><span class="tk-breakdown-note">Based on ${fmtUSD(r.annual)}/yr in token spend (${fmtUSD(spend)}/mo). ${combineNote}</span></td></tr>`;
     bt.innerHTML = html;
   }
+  if(!ready){
+    savingsEl.textContent = 'Check your inputs';
+    savingsPctEl.textContent = 'Correct the highlighted fields to calculate an estimate.';
+    document.getElementById('compareBlock').classList.add('tk-hidden');
+
+  }
+
+  savingsEl.classList.toggle('is-message', !savingsEl.textContent.includes('$'));
+  syncStepAccess();
+
 }
 
 /* ===== Before/after bars: today's bill vs. the bill with the AI Data Plane =====
@@ -1208,7 +1866,7 @@ function render(){
 const compareData = { today: null, after: null };
 function renderCompare(gpu, ready, r, R, S, D){
   const block = document.getElementById('compareBlock');
-  document.getElementById('compareTip').hidden = true;
+
   block.querySelectorAll('.tk-compare-row.is-active').forEach(row => row.classList.remove('is-active'));
   const show = ready && (gpu || r.n > 0);
   block.classList.toggle('tk-hidden', !show);
@@ -1219,8 +1877,8 @@ function renderCompare(gpu, ready, r, R, S, D){
   const scale = Math.max(today, afterHi) || 1;
   const pctW = v => `${(v / scale * 100).toFixed(2)}%`;
 
-  document.getElementById('todayLabel').textContent = gpu ? 'Today: dedicated GPUs' : 'Today';
-  document.getElementById('afterLabel').textContent = gpu ? 'Serverless, with the AI Data Plane™' : 'With the AI Data Plane™';
+  document.getElementById('todayLabel').textContent = gpu ? 'Current GPU cost / year' : 'Current cost / year';
+  document.getElementById('afterLabel').textContent = gpu ? 'Estimated serverless cost / year' : 'Estimated cost / year';
   document.getElementById('todayValue').textContent = fmtUSD(today);
   document.getElementById('afterValue').textContent = fmtRange(afterLo, afterHi, fmtUSD);
   document.getElementById('todayBar').style.width = pctW(today);
@@ -1233,10 +1891,14 @@ function renderCompare(gpu, ready, r, R, S, D){
 
   const saveLo = today - afterHi, saveHi = today - afterLo;
   const foot = document.getElementById('compareFoot');
-  if(saveHi <= 0){
-    foot.textContent = 'At this traffic, dedicated GPUs cost less than serverless. Capella Model Service offers both, so see the provisioned GPU option below.';
+  if(Math.abs(saveLo) < 0.005 && Math.abs(saveHi) < 0.005){
+    foot.textContent = 'No model-cost reduction under these assumptions.';
+  } else if(!gpu && saveHi <= 0){
+    foot.textContent = 'No model-cost reduction under these assumptions.';
+  } else if(saveHi <= 0){
+    foot.textContent = 'At this traffic, your entered fleet costs less than the selected serverless option.';
   } else {
-    const lo = Math.max(0, saveLo) / today, hi = saveHi / today;
+    const lo = today > 0 ? Math.max(0, saveLo) / today : 0, hi = today > 0 ? saveHi / today : 0;
     foot.textContent = `${lo > 0 ? '' : 'Up to '}${rateLabel({ low: lo > 0 ? lo : hi, high: hi })} less than ${gpu ? 'the fleet costs today' : 'you spend today'}.`;
   }
   compareData.today = { value: `${fmtUSD(today)}/yr`, note: gpu ? 'dedicated GPU fleet' : `${fmtUSD(today / 12)}/mo in token spend` };
@@ -1282,7 +1944,7 @@ document.querySelectorAll('[data-req]').forEach(btn => {
 const gpuSel = document.getElementById('gpuPricing'), gpuHourly = document.getElementById('gpuHourly');
 gpuSel.innerHTML = Object.entries(GPU_RATE_PRESETS).map(([k, g]) => `<option value="${k}">${g.label}</option>`).join('');
 gpuSel.value = state.gpuPricing;
-document.getElementById('gpuPriceNote').textContent = `Rates for a g6e.12xlarge (4× NVIDIA L40S) in US East, checked ${PRICES_AS_OF}. An always-on fleet usually runs on reserved pricing, so that's the default.`;
+document.getElementById('gpuPriceNote').textContent = 'AWS g6e.12xlarge · US East';
 gpuSel.addEventListener('change', () => {
   state.gpuPricing = gpuSel.value;
   const g = GPU_RATE_PRESETS[state.gpuPricing];
@@ -1298,7 +1960,7 @@ gpuHourly.addEventListener('input', () => {
 const presetSel = document.getElementById('modelPreset');
 presetSel.innerHTML = Object.entries(MODEL_PRESETS).map(([k, m]) => `<option value="${k}">${m.label}</option>`).join('');
 presetSel.value = state.model;
-document.getElementById('priceNote').textContent = `Amazon Nova models, at Amazon Bedrock on-demand list prices for US regions, checked ${PRICES_AS_OF}. Capella bills serverless models in Capella Credits at the rates shown when you deploy.`;
+document.getElementById('priceNote').textContent = `Bedrock list rates · ${PRICES_AS_OF}. Confirm Capella deployment pricing.`;
 const priceIn = document.getElementById('priceIn'), priceOut = document.getElementById('priceOut');
 priceIn.value = state.price.in; priceOut.value = state.price.out;
 presetSel.addEventListener('change', () => {
@@ -1334,21 +1996,18 @@ function setSpend(v){
   document.getElementById('monthlySpend').value = v;
   render();
 }
+document.getElementById('inputSpendShare').addEventListener('input', e => {
+  state.inputSpendShare = clamp(nz(e.target.value), 0, 100);
+  render();
+});
+
+
 document.getElementById('monthlySpend').addEventListener('input', e => {
-  state.monthlySpend = Math.max(0, parseFloat(e.target.value) || 0);
+  state.monthlySpend = nz(e.target.value);
   render();
 });
 document.querySelectorAll('.button-row [data-spend]').forEach(btn => {
   btn.addEventListener('click', () => setSpend(parseInt(btn.dataset.spend, 10)));
-});
-
-document.getElementById('toggleBreakdown').addEventListener('click', () => {
-  const box = document.getElementById('breakdownBox');
-  const btn = document.getElementById('toggleBreakdown');
-  const showing = box.style.display !== 'none';
-  box.style.display = showing ? 'none' : 'block';
-  btn.setAttribute('aria-expanded', String(!showing));
-  btn.innerHTML = showing ? 'How we calculate this &#9662;' : 'How we calculate this &#9652;';
 });
 
 document.getElementById('resetRates').addEventListener('click', () => {
@@ -1363,39 +2022,196 @@ document.addEventListener('click', () => {
 
 document.querySelectorAll('[data-as-of]').forEach(el => { el.textContent = AGENT_MEMORY_AS_OF; });
 
-(function wireCompareTooltip(){
-  const block = document.getElementById('compareBlock');
-  const tip = document.getElementById('compareTip');
-  const show = row => {
-    const d = compareData[row.dataset.row];
-    if(!d) return;
-    tip.textContent = '';
-    const v = document.createElement('strong'); v.textContent = d.value;
-    const l = document.createElement('span'); l.textContent = ` · ${d.note}`;
-    tip.append(v, l);
-    tip.hidden = false;
-    /* One line over the row's own bar, right edge at the bar's end, kept inside the card,
-       so it never covers the value labels above the bars. */
-    const b = block.getBoundingClientRect(), t = row.querySelector('.tk-compare-track').getBoundingClientRect();
-    const bars = [...row.querySelectorAll('.tk-bar, .tk-bar-range')].filter(el => el.offsetWidth > 0);
-    const end = Math.max(...bars.map(el => el.getBoundingClientRect().right)) - b.left;
-    const left = Math.min(Math.max(8, end - tip.offsetWidth), b.width - tip.offsetWidth - 8);
-    tip.style.left = `${Math.max(8, left)}px`;
-    tip.style.top = `${t.top - b.top + t.height / 2 - tip.offsetHeight / 2}px`;
-    row.classList.add('is-active');
-  };
-  const hide = row => { tip.hidden = true; row.classList.remove('is-active'); };
-  block.querySelectorAll('.tk-compare-row').forEach(row => {
-    row.addEventListener('pointerenter', () => show(row));
-    row.addEventListener('pointerleave', () => hide(row));
-    row.addEventListener('focus', () => show(row));
-    row.addEventListener('blur', () => hide(row));
-  });
-})();
 
+
+
+let currentStep = 1;
+let unlockedStep = 1;
+function syncStepAccess(){
+  document.querySelector('.step-nav ol').style.setProperty('--active-step',currentStep-1);
+  document.querySelectorAll('.step-nav [data-go-step]').forEach(button=>{
+    const step=Number(button.dataset.goStep);
+    button.disabled=step>unlockedStep;
+    button.classList.toggle('step-complete',step<unlockedStep);
+    button.setAttribute('aria-label',button.textContent.trim()+(step<unlockedStep?' — completed':''));
+  });
+  document.querySelector('[data-next-step="3"]').disabled=state.enabled.size===0;
+}
+
+function validateInputs(focusError){
+  const ids = state.mode === 'gpu'
+    ? ['gpuInstances','gpuHourly','gpuHours','reqMonth','inTok','outTok','priceIn','priceOut']
+    : ['monthlySpend','inputSpendShare'];
+  const fields = ids.map(id => document.getElementById(id));
+  document.querySelectorAll('[data-rate]').forEach(el => {
+    if(state.enabled.has(el.dataset.rate) && !(focusError && currentStep===1)) fields.push(el);
+  });
+  document.querySelectorAll('[data-share-input]').forEach(el=>{
+    if(state.enabled.has(el.dataset.shareInput) && !(focusError && currentStep===1)) fields.push(el);
+  });
+  let first = null;
+  fields.forEach(el => {
+    const n = Number(el.value);
+    const min = Number(el.min || 0), max = el.max ? Number(el.max) : 1e12;
+    let error = '';
+    if(el.value.trim() === '' || !Number.isFinite(n)) error = 'Enter a number.';
+    else if(n < min || n > max) error = `Enter a value from ${min.toLocaleString('en-US')} to ${max.toLocaleString('en-US')}.`;
+    else if(el.id === 'gpuInstances' && !Number.isInteger(n)) error = 'Enter a whole number of instances.';
+    else if(el.dataset.rate && state.rates[el.dataset.rate].low > state.rates[el.dataset.rate].high) error = 'Low reduction must not exceed high reduction.';
+    el.setAttribute('aria-invalid',String(!!error));
+    let message = document.getElementById(el.id+'-error');
+    if(!message){
+      message=document.createElement('span'); message.id=el.id+'-error'; message.className='field-error';
+      el.insertAdjacentElement('afterend',message);
+      const description=el.getAttribute('aria-describedby');
+      el.setAttribute('aria-describedby', [description,message.id].filter(Boolean).join(' '));
+    }
+    message.textContent=error; message.hidden=!error;
+    if(error && !first) first=el;
+  });
+  const summary=document.getElementById('validationSummary');
+  summary.hidden=!first;
+  summary.textContent=first ? 'Check your inputs. Correct the highlighted fields before continuing.' : '';
+  if(first && focusError){
+    const step=first.closest('[data-step]');
+    if(step) showStep(Number(step.dataset.step),false);
+    let parent=first.parentElement;
+    while(parent){if(parent.tagName==='DETAILS')parent.open=true;parent=parent.parentElement;}
+    const dialog=first.closest('dialog');if(dialog&&!dialog.open)dialog.showModal();
+    first.focus();
+  }
+  return !first;
+}
+function showStep(step, focusHeading=true){
+  if(step>unlockedStep)return;
+  currentStep=step;
+  document.querySelectorAll('.wizard-step').forEach(el=>{el.hidden=Number(el.dataset.step)!==step;});
+  document.querySelectorAll('[data-go-step]').forEach(button=>{
+    if(button.closest('.step-nav')){
+      if(Number(button.dataset.goStep)===step)button.setAttribute('aria-current','step');
+      else button.removeAttribute('aria-current');
+    }
+  });
+  syncStepAccess();
+  document.getElementById('stepStatus').textContent=`Step ${step} of 3`;
+  if(focusHeading){document.querySelector(`#step${step} h2`).focus();document.getElementById('calculator').scrollIntoView({block:'start'});}
+}
+function updateBillingControls(){
+  const reserved=['reserved1','reserved3'].includes(state.gpuPricing);
+  const hours=document.getElementById('gpuHours');
+  hours.disabled=reserved;
+  if(reserved){state.gpu.hours=730;hours.value=730;}
+}
+function wireGuidedEstimate(){
+  document.querySelectorAll('[data-input-share]').forEach(button=>button.addEventListener('click',()=>{
+    state.inputSpendShare=Number(button.dataset.inputShare);
+    document.getElementById('inputSpendShare').value=state.inputSpendShare;
+    render();
+  }));
+  for(const [id,enabled] of [['selectWorkloads',true],['clearWorkloads',false]]) {
+    document.getElementById(id).addEventListener('click',()=>{
+      state.enabled=enabled ? new Set(LEVERS.map(l=>l.id)) : new Set();
+      document.querySelectorAll('[data-lever-toggle]').forEach(input=>{ input.checked=enabled; });
+      document.querySelectorAll('[data-lever-controls]').forEach(control=>control.classList.toggle('tk-hidden',!enabled));
+      render();
+      document.getElementById(enabled ? 'clearWorkloads' : 'selectWorkloads').focus();
+    });
+  }
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    el.step=el.id==='gpuInstances'?'1':'any';
+    if(!el.max)el.max='1000000000000';
+    el.name=el.id;el.setAttribute('inputmode','decimal');el.setAttribute('autocomplete','off');
+  });
+  document.querySelectorAll('[data-next-step]').forEach(button=>button.addEventListener('click',()=>{
+    const next=Number(button.dataset.nextStep);
+    if(next===3 && state.enabled.size===0)return;
+    if(validateInputs(true)){unlockedStep=next;render();showStep(next);}
+  }));
+  document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>{
+    const next=Number(button.dataset.goStep);
+    if(next<=unlockedStep && (next<=currentStep||validateInputs(true)))showStep(next);
+  }));
+  document.getElementById('gpuPricing').addEventListener('change',()=>{updateBillingControls();render();});
+  document.getElementById('gpuHourly').addEventListener('input',()=>{updateBillingControls();render();});
+  for(const eventName of ['input','change','click']){
+    document.getElementById('calculator').addEventListener(eventName,event=>{
+      const step=event.target.closest('.wizard-step');
+      if(!step || !event.target.closest('input,select,[data-spend],[data-input-share],[data-req],[data-share-preset],#selectWorkloads,#clearWorkloads'))return;
+      if(Number(step.dataset.step)<3){unlockedStep=Math.min(unlockedStep,Number(step.dataset.step));syncStepAccess();}
+    });
+  }
+  updateBillingControls();showStep(1,false);
+}
+
+/* Theme is a local preference; blocked storage must not prevent use. */
+const themeToggle=document.getElementById('themeToggle');
+function setTheme(theme){
+  const dark=theme==='dark';
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  themeToggle.setAttribute('aria-checked',String(dark));
+}
+let initialTheme;
+try { initialTheme=localStorage.getItem('couchbase-estimator-theme'); } catch {}
+setTheme(initialTheme==='dark'||initialTheme==='light'?initialTheme:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+themeToggle.addEventListener('click',()=>{
+  const next=document.documentElement.dataset.theme==='dark'?'light':'dark';setTheme(next);
+  try { localStorage.setItem('couchbase-estimator-theme',next); } catch {}
+});
+const settingsDialog=document.getElementById('settingsDialog');
+document.getElementById('editAssumptions').addEventListener('click',()=>settingsDialog.showModal());
+document.getElementById('closeSettings').addEventListener('click',()=>{if(validateInputs(true)){settingsDialog.close();document.getElementById('editAssumptions').focus();}});
+settingsDialog.addEventListener('cancel',event=>{if(!validateInputs(true))event.preventDefault();});
+
+function syncSelectMenus(){
+ document.querySelectorAll('.select-trigger').forEach(button=>{
+  const select=document.getElementById(button.dataset.select);
+  button.querySelector('.select-value').textContent=select.selectedOptions[0]?.textContent||'';
+  document.querySelectorAll(`#${select.id}-menu [role=option]`).forEach(option=>option.setAttribute('aria-selected',String(option.dataset.value===select.value)));
+ });
+}
+function buildSelectMenus(){
+ document.querySelectorAll('.select-control select').forEach(select=>{
+  const wrapper=select.parentElement;
+  const label=document.querySelector(`label[for="${select.id}"]`);
+  const trigger=document.createElement('button');
+  trigger.type='button';trigger.id=select.id+'-trigger';trigger.className='select-trigger';trigger.dataset.select=select.id;
+  trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-controls',select.id+'-menu');
+  trigger.innerHTML='<span class="select-value"></span><span class="select-chevron" aria-hidden="true"></span>';
+  label.id=select.id+'-label';label.htmlFor=trigger.id;trigger.setAttribute('aria-labelledby',label.id+' '+trigger.id);
+  const menu=document.createElement('div');menu.id=select.id+'-menu';menu.className='select-menu';menu.setAttribute('popover','auto');menu.setAttribute('role','listbox');menu.setAttribute('aria-labelledby',label.id);
+  [...select.options].forEach(item=>{
+   const option=document.createElement('button');option.type='button';option.setAttribute('role','option');option.dataset.value=item.value;option.textContent=item.textContent;option.tabIndex=-1;
+   option.addEventListener('click',()=>{select.value=item.value;select.dispatchEvent(new Event('change',{bubbles:true}));syncSelectMenus();menu.hidePopover();trigger.focus();});
+   menu.append(option);
+  });
+  wrapper.append(trigger,menu);select.hidden=true;wrapper.classList.add('enhanced-select');
+  function position(){
+   const r=trigger.getBoundingClientRect(),height=menu.offsetHeight;
+   menu.style.width=r.width+'px';menu.style.left=Math.max(8,Math.min(r.left,innerWidth-r.width-8))+'px';
+   menu.style.top=(r.bottom+height+8>innerHeight && r.top>height+8 ? r.top-height-6 : r.bottom+6)+'px';
+   menu.style.maxHeight=Math.max(120,innerHeight-24)+'px';
+  }
+  function open(){menu.showPopover();position();trigger.setAttribute('aria-expanded','true');const options=[...menu.children];(options.find(o=>o.dataset.value===select.value)||options[0]).focus();}
+  trigger.addEventListener('click',()=>menu.matches(':popover-open')?menu.hidePopover():open());
+  trigger.addEventListener('keydown',event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();open();}});
+  menu.addEventListener('keydown',event=>{
+   const options=[...menu.children],index=options.indexOf(document.activeElement);
+   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;options[next].focus();}
+   if(event.key==='Escape'){event.preventDefault();menu.hidePopover();trigger.focus();}
+   if(event.key==='Tab'){menu.hidePopover();trigger.focus();}
+   if(event.key.length===1 && /[a-z]/i.test(event.key)){const match=options.find(o=>o.textContent.toLowerCase().startsWith(event.key.toLowerCase()));if(match)match.focus();}
+  });
+  menu.addEventListener('toggle',()=>trigger.setAttribute('aria-expanded',String(menu.matches(':popover-open'))));
+  window.addEventListener('resize',()=>{if(menu.matches(':popover-open'))menu.hidePopover();});
+  window.addEventListener('scroll',()=>{if(menu.matches(':popover-open'))menu.hidePopover();},{passive:true});
+ });
+ syncSelectMenus();
+}
+
+buildSelectMenus();
 buildLeverGroups();
 buildRateTable();
-buildArchetypeList();
+wireGuidedEstimate();
 render();
 </script>
 </body>

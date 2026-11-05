@@ -5,7 +5,7 @@ A one-page calculator that estimates how much the Couchbase AI Data Plane could 
 - **Per token:** the visitor enters monthly token spend, turns on the levers that match their workload, and gets a directional annual savings range.
 - **Dedicated GPUs:** the visitor enters their GPU fleet and traffic. The estimator prices the same traffic on a serverless model in Capella Model Service (billed per token through Amazon Bedrock), shows the fleet vs. serverless gap, then applies the levers to the serverless bill.
 
-Every assumption and source is shown on the page.
+Assumptions are editable in the calculator; methodology and sources are on `methodology.html`.
 
 **Status:** prototype for the couchbase.com web team. It's built to sit next to the [Database TCO Calculator](https://www.couchbase.com/database-tco-calculator/) and uses the same visual style and caching assumptions.
 
@@ -27,8 +27,11 @@ Open `index.html` in a browser. It has no build step and no dependencies apart f
 The total combines the levers instead of adding them, so it can never exceed the visitor's bill:
 
 ```
-lever fraction = share of spend × reduction rate      (caching: cache-eligible share × hit rate)
-lever savings  = token spend × [1 − (1 − f1)(1 − f2)(1 − f3)(1 − f4)]
+caching fraction c = cache-eligible share × hit rate
+prompt fraction f  = workload share × reduction rate
+input keep         = (1 − c) × product(1 − f)
+output keep        = 1 − c
+lever savings      = input bill × (1 − input keep) + output bill × (1 − output keep)
 ```
 
 On the dedicated GPU path, token spend is the serverless bill for the visitor's traffic:
@@ -52,3 +55,15 @@ Defaults: two g6e.12xlarge instances (4× NVIDIA L40S each) at the 1-year reserv
 ## Before this goes live
 
 Read the open items in `docs/MESSAGING-REVIEW.md`. A few claims and scope details still need Legal or product confirmation before external use.
+
+Input and output charges are modeled separately. Per-token mode asks for the input-cost share of the bill (50% is an editable illustrative default); GPU mode derives it from token counts and prices. Prompt reductions leave output charges unchanged. Run regression tests with `node --test tests/*.test.cjs`.
+
+## Guided estimate
+
+The local prototype now guides visitors through current spending, workload choices,
+and one annual result. Advanced fleet/model assumptions, reduction rates and source
+material are disclosed on demand. Reserved GPU presets use 730 committed billed
+hours/month; on-demand/custom presets use entered billed hours. Existing reserved
+commitments may still be payable after migration. Inputs are validated before
+progression, and zero values remain valid. See the implementation plan and web-team
+handoff for verification details and modeling limits.

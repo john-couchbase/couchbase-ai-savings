@@ -2,6 +2,15 @@
 
 Review of the original token estimator prototype as a vehicle for Couchbase AI Data Plane promotion, and the changes made in this version. Reviewed November 2026.
 
+## Math correction after the prototype review
+
+The historical figures below describe the earlier prototype and are superseded by
+WEB-TEAM-HANDOFF.md. Prompt-reduction rates now apply only to input charges, while
+caching applies to input and output charges. Per-token mode exposes an editable
+input-cost share; GPU mode derives it from token counts and prices. The corrected
+all-lever per-token default is $44,107–$75,738/year with a 50% input-cost share.
+Complete reductions display "no finite break-even" rather than "InfinityM".
+
 ## Summary
 
 The original had a useful structure: a top-down estimate against current spend, levers the visitor turns on, and assumptions shown on the page. The problems were in the claims and the math. One rate used the wrong baseline, two were invented, it said a real Couchbase capability didn't exist, the total could pass 100% of spend, and internal notes were visible on the public page. All of that is fixed below. The open items at the end still need confirmation before launch.
