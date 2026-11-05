@@ -1,7 +1,7 @@
 Official Couchbase assets retrieved from https://www.couchbase.com/ on November 4, 2026.
 
 - couchbase-logo.svg: unmodified header logo from the official homepage.
-- couchbase-favicon.svg: https://www.couchbase.com/wp-content/uploads/2026/07/couchbase-favicon.svg
+- couchbase-favicon.svg: official red circle and white couch symbol extracted from the bundled header logo, with padding for browser tabs. Replaces a failed upstream favicon download.
 
 Couchbase and its logo are registered trademarks of Couchbase, Inc.
 
