@@ -62,7 +62,7 @@ main { border-radius:16px; }
 .ambient-scene { display:none; }
 .hero { max-width:none;background:#080808;padding:36px max(24px,calc((100vw - 1280px)/2)) 0; }
 .brand-row { padding:16px 22px;background:#fff;border:0;border-radius:16px;gap:24px; }
-:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo.svg'); }
+:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo-dark.svg'); }
 .brand-row .theme-control { color:#444; }
 .brand-links { margin-left:auto;display:flex;gap:24px;align-items:center; }
 .brand-links a { color:#141414;text-decoration:none;font-size:14px;font-weight:600; }
@@ -378,16 +378,18 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
 @media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
 
-/* Couchbase palette: black canvas, beige banner, light working panels. */
+/* Black navigation and calculator frame; beige is reserved for the hero. */
 :root[data-theme=dark] {
  --page:#000;--surface:#202020;--subtle:#333;--selected:#49332f;
- --ink:#fff8eb;--muted:#e0d5c5;--line:#746858;--control-line:#b4a58e;
+ --ink:#fff;--muted:#d6d6d6;--line:#ec1218;--control-line:#888;
  --link:#ffc1b5;--cb-red-dark:#ffc1b5;
 }
-:root[data-theme=dark] .hero { background:#fff0da;border-bottom:0; }
-:root[data-theme=dark] .brand-row { background:#fff9ee;border:1px solid #e4d3b9; }
-:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo.svg'); }
-:root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:#24211d; }
+:root[data-theme=dark] .hero { background:#000;border-bottom:0; }
+:root[data-theme=dark] .intro.brand-intro { background:#fff0da;margin-top:28px;padding:48px 32px;border-radius:16px; }
+:root[data-theme=dark] .custom-art { right:24px; }
+:root[data-theme=dark] .brand-row { background:#000;border:1px solid var(--cb-red); }
+:root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo-dark.svg'); }
+:root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:#fff; }
 :root[data-theme=dark] .brand-intro .subhead { color:#655747; }
 :root[data-theme=dark] .brand-intro h1,:root[data-theme=dark] .hero-kicker { color:#211e19; }
 :root[data-theme=dark] .custom-art { background:#fff9ee;--art-paper:#fff9ee; }
@@ -396,8 +398,8 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root[data-theme=dark] .step-nav button:disabled { color:#d0c2b0;opacity:.65; }
 /* Locally scoped tokens keep text and controls coherent on the cream panels. */
 :root[data-theme=dark] :is(.input-section,.tk-mode-grid .check-card,.tool-group,.review-inputs,.inline-methodology,.gpu-assumptions,.comparison-details,#settingsDialog,#gpuInputs>.input-stack>.field,#step3 .tk-compare-row,#step3 .hero-card) {
- --surface:#fff0da;--subtle:#fff9ee;--selected:#fbe0c2;--ink:#29231d;--muted:#655747;
- --line:#ddc7a7;--control-line:#96816a;--link:#ad171b;--cb-red-dark:#ad171b;
+ --surface:#fff;--subtle:#f5f5f5;--selected:#fff0f0;--ink:#181818;--muted:#555;
+ --line:#ec1218;--control-line:#999;--link:#ad171b;--cb-red-dark:#ad171b;
  color:var(--ink);background:var(--surface);border-color:var(--line);color-scheme:light;
 }
 :root[data-theme=dark] input[type=number],:root[data-theme=dark] .select-trigger { background:var(--subtle);color:var(--ink);border-color:var(--control-line);box-shadow:none; }
@@ -407,3 +409,7 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root[data-theme=dark] #settingsDialog .sources-panel { background:transparent; }
 :root[data-theme=dark] #step3 .hero-card { background:var(--surface);border-color:var(--line); }
 :root[data-theme=dark] .footer-social a:hover { background:var(--subtle);color:var(--ink); }
+
+:root[data-theme=dark] .review-inputs dl>div,:root[data-theme=dark] .inline-methodology details,:root[data-theme=dark] .gpu-assumptions>.field { border-bottom-color:#dedede;border-top-color:#dedede; }
+:root[data-theme=dark] .site-footer { border-color:var(--cb-red); }
+@media(max-width:760px){:root[data-theme=dark] .intro.brand-intro{padding:32px 20px;}:root[data-theme=dark] .custom-art{right:auto;}}
