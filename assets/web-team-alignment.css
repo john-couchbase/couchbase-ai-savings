@@ -1,0 +1,58 @@
+/* Align with Couchbase's TCO calculator while retaining the guided demo. */
+:root { --cb-red:#d92e27;--action-red:#d92e27;--cb-red-dark:#b5231d; }
+:root:not([data-theme=dark]) { --page:#faf9f6;--surface:#fff;--subtle:#faf5eb;--selected:#fff0da;--ink:#181818;--muted:#595953;--line:#deddd8;--control-line:#aaa89f;--link:#af241e; }
+:root:not([data-theme=dark]) body { background:var(--page); }
+.hero { padding-top:24px; }
+.brand-row { padding:0 0 20px;border-bottom:1px solid var(--line); }
+:root .intro.brand-intro { background:#111;border:1px solid #111;border-radius:16px;padding:32px;min-height:210px;margin:24px 0; }
+:root:not([data-theme=dark]) .brand-intro h1,:root[data-theme=dark] .brand-intro h1 { color:#fff;font-size:clamp(30px,3.4vw,42px);line-height:1.15;letter-spacing:-.035em; }
+:root:not([data-theme=dark]) .brand-intro .subhead,:root[data-theme=dark] .brand-intro .subhead { color:#e6e4de;font-size:16px;line-height:1.65; }
+.intro-copy { max-width:58%; }
+.custom-art { right:16px;top:18px;width:40%;height:180px;color:#d8be89;--art-paper:#111;--art-ink:#202020; }
+:root:not([data-theme=dark]) main { border:1px solid var(--line);box-shadow:none; }
+main { border-radius:16px; }
+.step-nav,:root:not([data-theme=dark]) .step-nav { background:transparent;padding:24px 28px 0;border-radius:16px 16px 0 0; }
+.step-nav ol,:root:not([data-theme=dark]) .step-nav ol { background:var(--subtle);border-color:var(--line); }
+.step-nav ol::before { background:var(--cb-red);box-shadow:none; }
+.wizard-step { padding:28px; }
+.wizard-step h2 { font-size:28px;line-height:1.25;letter-spacing:-.025em;margin-bottom:10px; }
+.input-section { border-radius:12px;overflow:hidden; }
+:root:not([data-theme=dark]) .input-section h3,:root:not([data-theme=dark]) .input-section:first-child h3,:root:not([data-theme=dark]) .input-section:nth-child(2) h3 { background:var(--subtle);border-color:var(--line);color:var(--ink); }
+:root:not([data-theme=dark]) #gpuInputs { background:var(--subtle);border-color:var(--line); }
+:root:not([data-theme=dark]) .gpu-assumptions { border-color:var(--line); }
+:root:not([data-theme=dark]) .gpu-assumptions>summary { background:var(--surface);color:var(--ink); }
+.tool-group { --workload-accent:var(--cb-red)!important;border-radius:12px; }
+:root:not([data-theme=dark]) .tool-group { background:#fcfaf6;border:1px solid var(--line); }
+:root:not([data-theme=dark]) .tool-group:has(input[type=checkbox]:checked) { background:#fff6ec;border:1px solid var(--cb-red); }
+.workload-name { font-size:18px;letter-spacing:-.02em; }
+.check-card small { font-weight:400; }
+:root:not([data-theme=dark]) .select-trigger { border-color:var(--control-line); }
+.select-trigger[aria-expanded=true],.select-trigger:focus-visible { outline-color:var(--link); }
+.select-menu button:focus { border-color:var(--link); }
+.select-control .select-trigger:hover,.select-control .select-trigger:focus { border-color:var(--link); }
+#step3 .result-grid { overflow:hidden;border:1px solid var(--line);border-radius:12px; }
+#step3 .result-card.primary { background:var(--cb-red);color:#fff;align-items:flex-start;text-align:left;padding:28px; }
+#step3 .result-card.primary>span,#step3 .result-card.primary #savingsPct { color:#fff; }
+#step3 .result-card.primary strong { font-weight:600;font-size:clamp(27px,3.2vw,36px); }
+#step3 .result-card.primary strong.is-message { font-size:20px; }
+#step3 .hero-card,:root:not([data-theme=dark]) #step3 .hero-card { background:#111;border:1px solid #333;border-radius:12px;padding:24px; }
+#step3 .hero-card .next-step-copy p { color:#fff!important; }
+#step3 .hero-card .primary-action { background:var(--cb-red);color:#fff;border-color:var(--cb-red); }
+#step3 .hero-card .primary-action:hover { background:#b5231d;border-color:#b5231d; }
+:root[data-theme=dark] .tool-group:has(input[type=checkbox]:checked) { background:#332724;border-color:#e67468; }
+:root[data-theme=dark] { --link:#ffaaa4; }
+:root:not([data-theme=dark]) .ambient-scene { opacity:.25; }
+@media(max-width:640px) {
+ .intro.brand-intro { padding:24px;min-height:220px; }
+ .intro-copy { max-width:70%; }
+ .brand-intro h1 { max-width:10ch;font-size:30px; }
+ .brand-intro .subhead { font-size:15px;max-width:23ch; }
+ .custom-art { width:32%;right:-6px;top:28px;opacity:.8; }
+ .step-nav { padding:16px 16px 0; }
+ :root:not([data-theme=dark]) .step-nav { padding:16px 16px 0; }
+ .wizard-step { padding:24px 16px; }
+ .wizard-step h2 { font-size:25px; }
+ #step3 .result-card.primary { padding:24px 20px; }
+}
+
+:root:not([data-theme=dark]) .intro.brand-intro { background:#111;border-color:#111; }
