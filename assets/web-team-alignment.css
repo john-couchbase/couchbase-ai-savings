@@ -458,3 +458,21 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
  .calculator-intro { text-align:center; }
  .calculator-intro h2,.calculator-intro p { text-wrap:balance; }
 }
+
+/* Equal, stable step tabs in both themes and on every step. */
+:root .step-nav,#calculator:has(#step3:not([hidden])) .step-nav { grid-column:1;width:100%; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .step-nav ol {
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;width:100%;max-width:none;
+ margin:0;padding:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;
+}
+:root .step-nav li { margin:0;padding:0;border:0;min-width:0; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .step-nav button {
+ display:flex;align-items:center;justify-content:center;text-align:center;width:100%;height:52px;
+ margin:0;padding:12px 8px;border:0;border-bottom:3px solid transparent;border-radius:0;
+ font-size:15px;line-height:1.2;font-weight:600;color:var(--muted);background:transparent;box-shadow:none;
+}
+:root:is([data-theme=dark],:not([data-theme=dark])) .step-nav button[aria-current] { color:var(--ink);border-bottom-color:var(--cb-red); }
+:root:is([data-theme=dark],:not([data-theme=dark])) .step-nav button:disabled { color:var(--muted);opacity:.6; }
+:root .step-nav button:not(:disabled):hover { background:var(--subtle); }
+:root .step-nav button:focus-visible { outline:2px solid var(--link);outline-offset:-4px; }
+@media(max-width:400px){:root .step-nav button{font-size:14px;padding-inline:4px;}}
