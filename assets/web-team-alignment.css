@@ -378,17 +378,19 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
 @media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
 
-/* Couchbase palette: charcoal canvas, cream working panels, red actions. */
+/* Couchbase palette: black canvas, beige banner, light working panels. */
 :root[data-theme=dark] {
- --page:#292622;--surface:#37322c;--subtle:#494139;--selected:#594238;
+ --page:#000;--surface:#202020;--subtle:#333;--selected:#49332f;
  --ink:#fff8eb;--muted:#e0d5c5;--line:#746858;--control-line:#b4a58e;
  --link:#ffc1b5;--cb-red-dark:#ffc1b5;
 }
-:root[data-theme=dark] .hero { background:#292622;border-bottom:1px solid var(--line); }
-:root[data-theme=dark] .brand-row { background:#fff0da;border:0; }
+:root[data-theme=dark] .hero { background:#fff0da;border-bottom:0; }
+:root[data-theme=dark] .brand-row { background:#fff9ee;border:1px solid #e4d3b9; }
 :root[data-theme=dark] .brand-row .brand-logo { content:url('couchbase-logo.svg'); }
 :root[data-theme=dark] .brand-links a,:root[data-theme=dark] .brand-row .theme-control { color:#24211d; }
-:root[data-theme=dark] .brand-intro .subhead { color:var(--muted); }
+:root[data-theme=dark] .brand-intro .subhead { color:#655747; }
+:root[data-theme=dark] .brand-intro h1,:root[data-theme=dark] .hero-kicker { color:#211e19; }
+:root[data-theme=dark] .custom-art { background:#fff9ee;--art-paper:#fff9ee; }
 :root[data-theme=dark] .step-nav button { color:var(--muted); }
 :root[data-theme=dark] .step-nav button[aria-current] { color:var(--ink); }
 :root[data-theme=dark] .step-nav button:disabled { color:#d0c2b0;opacity:.65; }
