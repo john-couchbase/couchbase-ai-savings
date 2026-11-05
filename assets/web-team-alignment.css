@@ -1,5 +1,5 @@
 /* Align with Couchbase's TCO calculator while retaining the guided demo. */
-:root { --cb-red:#d92e27;--action-red:#d92e27;--cb-red-dark:#b5231d; }
+:root { --cb-red:#ec1218;--action-red:#ec1218;--cb-red-dark:#b5231d; }
 :root:not([data-theme=dark]) { --page:#faf9f6;--surface:#fff;--subtle:#faf5eb;--selected:#fff0da;--ink:#181818;--muted:#595953;--line:#deddd8;--control-line:#aaa89f;--link:#af241e; }
 :root:not([data-theme=dark]) body { background:var(--page); }
 .hero { padding-top:24px; }
@@ -317,7 +317,7 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 /* The result is three separate units, matching the reference's visual rhythm. */
 :root #step3 .results-panel,:root #step3 .panel { background:transparent;border:0;box-shadow:none;padding:0; }
 #step3 .result-grid { background:transparent;border:0;overflow:visible;gap:20px; }
-#step3 .result-card.primary { border:0;border-radius:var(--radius-card);background:#d92e27;padding:24px;box-shadow:none; }
+#step3 .result-card.primary { border:0;border-radius:var(--radius-card);background:#ec1218;padding:24px;box-shadow:none; }
 #step3 .result-card.primary strong { font-size:clamp(24px,2.2vw,32px);font-weight:500;line-height:1.35; }
 #step3 #compareBlock:not(.tk-hidden) { padding:0;background:transparent;border:0;border-radius:0;gap:16px; }
 #step3 .tk-compare-row,#step3 .tk-compare-row+.tk-compare-row { padding:20px 16px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);text-align:left; }
@@ -361,3 +361,19 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 .gpu-assumptions>.input-stack { padding:0; }
 .gpu-assumptions>.tk-subhead { margin:24px 0 16px; }
 :root:not([data-theme=dark]) #step3 .hero-card { background:var(--surface);border-color:var(--line); }
+
+/* Brand alignment with the live Couchbase site, November 2026. */
+:root { --cb-red:#ec1218;--action-red:#ec1218;--cb-red-dark:#b90e13; }
+:root[data-theme=dark] { --cb-red-dark:#ffaaa4; }
+:root .primary-action,:root #step3 .hero-card .primary-action { background:var(--cb-red);border-color:var(--cb-red);color:#fff; }
+:root .primary-action:hover,:root #step3 .hero-card .primary-action:hover { background:#ce1015;border-color:#ce1015; }
+:root .wizard-step h2,:root .review-inputs h2,:root .inline-methodology h2 { font-family:'Centra No2',Inter,sans-serif;font-weight:500;letter-spacing:-.02em; }
+:root .workload-name,:root .tk-mode-grid .check-card>span,:root .choice-option { font-family:'Centra No2',Inter,sans-serif;font-weight:500; }
+:root .primary-action,:root .footer-resources h2 { font-family:'Centra No2',Inter,sans-serif;font-weight:500; }
+:root .check-card small { font-family:Inter,sans-serif;font-weight:400;line-height:1.5; }
+.footer-social { display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:20px 0;border-top:1px solid var(--line); }
+.footer-social a { display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:8px;color:var(--ink);text-decoration:none;transition:background 160ms,color 160ms; }
+.footer-social svg { display:block;width:24px;height:24px;fill:currentColor; }
+.footer-social a:hover { color:var(--link);background:var(--selected); }
+.footer-social a:focus-visible { outline:2px solid var(--link);outline-offset:3px; }
+@media(prefers-reduced-motion:reduce){.footer-social a{transition:none;}}
