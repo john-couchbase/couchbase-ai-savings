@@ -547,8 +547,8 @@ body { isolation:isolate; }
 @media(prefers-reduced-motion:reduce) { .ambient-scene::before { animation:none; } }
 
 /* Secondary decorative accent: periwinkle, separate from red actions and green selection. */
-:root { --decorative-accent:#7866c2; }
-:root[data-theme=dark] { --decorative-accent:#b2a2f0; }
+:root { --decorative-accent:#547d91; }
+:root[data-theme=dark] { --decorative-accent:#789aaa; }
 :root .ambient-scene { opacity:.85; }
 @media(min-width:1101px) {
  #calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar::after {
@@ -566,3 +566,8 @@ body { isolation:isolate; }
 @media(prefers-reduced-motion:reduce) { #calculator .calculator-sidebar::after { animation:none; } }
 
 .site-footer { background:var(--page); }
+
+/* Keep the accent atmospheric; no standalone graphic below the sidebar. */
+#calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar::after { display:none; }
+:root .ambient-scene { opacity:.32; }
+:root[data-theme=dark] .ambient-scene { opacity:.3; }
