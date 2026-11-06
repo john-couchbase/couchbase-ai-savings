@@ -31,8 +31,8 @@ main { border-radius:16px; }
 .select-menu button:focus { border-color:var(--link); }
 .select-control .select-trigger:hover,.select-control .select-trigger:focus { border-color:var(--link); }
 #step3 .result-grid { overflow:hidden;border:1px solid var(--line);border-radius:12px; }
-#step3 .result-card.primary { background:var(--cb-red);color:#fff;align-items:flex-start;text-align:left;padding:28px; }
-#step3 .result-card.primary>span,#step3 .result-card.primary #savingsPct { color:#fff; }
+#step3 .result-card.primary { background:#fff0da;color:#181818;align-items:flex-start;text-align:left;padding:28px; }
+#step3 .result-card.primary>span,#step3 .result-card.primary #savingsPct { color:#514637; }
 #step3 .result-card.primary strong { font-weight:600;font-size:clamp(27px,3.2vw,36px); }
 #step3 .result-card.primary strong.is-message { font-size:20px; }
 #step3 .hero-card,:root:not([data-theme=dark]) #step3 .hero-card { background:#111;border:1px solid #333;border-radius:12px;padding:24px; }
@@ -317,7 +317,7 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 /* The result is three separate units, matching the reference's visual rhythm. */
 :root #step3 .results-panel,:root #step3 .panel { background:transparent;border:0;box-shadow:none;padding:0; }
 #step3 .result-grid { background:transparent;border:0;overflow:visible;gap:20px; }
-#step3 .result-card.primary { border:0;border-radius:var(--radius-card);background:#ec1218;padding:24px;box-shadow:none; }
+#step3 .result-card.primary { border:0;border-radius:var(--radius-card);background:#fff0da;padding:24px;box-shadow:none; }
 #step3 .result-card.primary strong { font-size:clamp(24px,2.2vw,32px);font-weight:500;line-height:1.35; }
 #step3 #compareBlock:not(.tk-hidden) { padding:0;background:transparent;border:0;border-radius:0;gap:16px; }
 #step3 .tk-compare-row,#step3 .tk-compare-row+.tk-compare-row { padding:20px 16px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--surface);text-align:left; }
