@@ -476,3 +476,27 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root .step-nav button:not(:disabled):hover { background:var(--subtle); }
 :root .step-nav button:focus-visible { outline:2px solid var(--link);outline-offset:-4px; }
 @media(max-width:400px){:root .step-nav button{font-size:14px;padding-inline:4px;}}
+
+/* Measured Couchbase TCO typography and interaction tokens. */
+:root {
+ --tco-title:clamp(32px,2rem + ((1vw - 3.2px)*1.481),48px);
+ --tco-heading:clamp(24px,1.5rem + ((1vw - 3.2px)*.741),32px);
+ --tco-section:clamp(18px,1.125rem + ((1vw - 3.2px)*.556),24px);
+ --tco-hover:#7c0206;--tco-pressed:#560003;
+}
+:root:is([data-theme=dark],:not([data-theme=dark])) .brand-intro h1 { font-size:var(--tco-title);font-weight:500;line-height:1.08;letter-spacing:-.02em; }
+:root .calculator-intro h2,:root #step3 h2 { font-size:var(--tco-heading);font-weight:500;line-height:1.2; }
+:root #tokenInputs .input-section h3,:root .wizard-step>h2 { font-size:var(--tco-section);font-weight:500;line-height:1.25; }
+:root #tokenInputs input[type=number],:root #gpuInputs input[type=number] { font-family:'Centra No2',Inter,sans-serif;font-weight:500;font-size:16px;line-height:1.3;min-height:48px;padding:12px;border-radius:12px; }
+:root:not([data-theme=dark]) #tokenInputs input[type=number],:root:not([data-theme=dark]) #gpuInputs input[type=number] { background:#fff0da;border-color:#d2d5d9;color:#000; }
+:root #tokenInputs .preset-row button,:root #tokenInputs .share-presets button,:root #gpuInputs>.button-row button { font-family:Inter,sans-serif;font-size:16px;font-weight:700;min-height:46px;padding:12px 8px;border-radius:12px; }
+:root:not([data-theme=dark]) #tokenInputs .preset-row button { border-color:#d2d5d9;color:#000;background:transparent; }
+:root:not([data-theme=dark]) :is(.choice-option,.tk-mode-grid .check-card,.archetype-grid label):has(input:checked),:root:not([data-theme=dark]) #tokenInputs .preset-row button[aria-pressed=true] { background:rgba(236,18,24,.05);border-color:#ec1218;color:#181818; }
+:root:not([data-theme=dark]) #tokenInputs .preset-row button:not([aria-pressed=true]):hover,:root:not([data-theme=dark]) #gpuInputs>.button-row button:not([aria-pressed=true]):hover { background:rgba(255,240,219,.25); }
+:root:is([data-theme=dark],:not([data-theme=dark])) .primary-action,:root:is([data-theme=dark],:not([data-theme=dark])) #step3 .hero-card .primary-action {
+ background:#ec1218;border-color:#ec1218;color:#fff;font-family:Inter,sans-serif;font-size:16px;font-weight:500;border-radius:12px;
+ transition:background-color 160ms ease,outline-color 160ms ease;outline:2px solid transparent;outline-offset:2px;
+}
+:root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:hover,:root:is([data-theme=dark],:not([data-theme=dark])) #step3 .hero-card .primary-action:hover { background:var(--tco-hover);border-color:var(--tco-hover);outline-color:#ec1218; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:active,:root:is([data-theme=dark],:not([data-theme=dark])) #step3 .hero-card .primary-action:active { background:var(--tco-pressed);outline-color:#b30005;filter:none; }
+:root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:focus-visible { outline:2px dashed var(--link);outline-offset:3px; }
