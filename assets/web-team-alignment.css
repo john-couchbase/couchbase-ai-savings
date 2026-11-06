@@ -612,3 +612,11 @@ body { isolation:isolate; }
  #calculator:has(#step3:not([hidden])) .review-actions { display:grid;grid-template-columns:1fr 1fr; }
  :root .review-actions .back-action { padding:10px 8px; }
 }
+
+/* Keep the workload recap alongside the choices during a desktop demo. */
+@media(min-width:1101px) {
+ #calculator:has(#step2:not([hidden])) .calculator-sidebar {
+  position:sticky;top:clamp(16px,calc((100svh - 700px) / 2),100px);
+  margin-top:180px;align-self:start;
+ }
+}
