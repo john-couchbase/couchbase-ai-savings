@@ -500,3 +500,10 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:hover,:root:is([data-theme=dark],:not([data-theme=dark])) #step3 .hero-card .primary-action:hover { background:var(--tco-hover);border-color:var(--tco-hover);outline-color:#ec1218; }
 :root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:active,:root:is([data-theme=dark],:not([data-theme=dark])) #step3 .hero-card .primary-action:active { background:var(--tco-pressed);outline-color:#b30005;filter:none; }
 :root:is([data-theme=dark],:not([data-theme=dark])) .primary-action:focus-visible { outline:2px dashed var(--link);outline-offset:3px; }
+
+/* Selected workload checkmark uses the live TCO's exact checked green. */
+:root { --tco-checked:#21ea2a; }
+:root .tool-group>.check-card input[type=checkbox] { width:24px;height:24px;min-width:24px;flex:0 0 24px;border-radius:6px;margin-top:2px;background:var(--subtle);border:1px solid var(--control-line); }
+:root .tool-group>.check-card input[type=checkbox]::before { content:none; }
+:root .tool-group>.check-card input[type=checkbox]:checked { background:var(--tco-checked);border-color:#111; }
+:root .tool-group>.check-card input[type=checkbox]:checked::after { content:'';position:absolute;left:7px;top:3px;width:6px;height:12px;border:solid #111;border-width:0 2px 2px 0;transform:rotate(45deg); }
