@@ -507,3 +507,19 @@ input[type=number],:root:not([data-theme=dark]) input[type=number] { background:
 :root .tool-group>.check-card input[type=checkbox]::before { content:none; }
 :root .tool-group>.check-card input[type=checkbox]:checked { background:var(--tco-checked);border-color:#111; }
 :root .tool-group>.check-card input[type=checkbox]:checked::after { content:'';position:absolute;left:7px;top:3px;width:6px;height:12px;border:solid #111;border-width:0 2px 2px 0;transform:rotate(45deg); }
+
+/* Group supporting content so the Spend sidebar does not leave a vacant column. */
+.calculator-sidebar { display:contents; }
+:root { --baseline-tint:#edf4f3;--baseline-ink:#31575c;--baseline-line:#c5d8d5; }
+:root[data-theme=dark] { --baseline-tint:#202e30;--baseline-ink:#b7d8d4;--baseline-line:#415c60; }
+@media(min-width:1101px) {
+ #calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar {
+  display:flex;flex-direction:column;gap:24px;grid-column:2;grid-row:1 / span 6;min-width:0;align-self:start;
+ }
+ #calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar .inline-methodology { margin:0; }
+ #calculator:not(:has(#step3:not([hidden]))) .review-inputs dl>div:first-child {
+  background:var(--baseline-tint);border:1px solid var(--baseline-line);border-radius:10px;padding:16px;margin-top:20px;
+ }
+ #calculator:not(:has(#step3:not([hidden]))) .review-inputs dl>div:first-child dt,
+ #calculator:not(:has(#step3:not([hidden]))) .review-inputs dl>div:first-child dd { color:var(--baseline-ink); }
+}

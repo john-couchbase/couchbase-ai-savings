@@ -1093,7 +1093,7 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
  #step3 .tk-compare-label{gap:4px;}
 }
 </style>
-<link rel="stylesheet" href="assets/web-team-alignment.css?v=20">
+<link rel="stylesheet" href="assets/web-team-alignment.css?v=21">
 </head>
 <body>
 <div class="ambient-scene" aria-hidden="true"><div class="ambient-orbit"><i></i><i></i><i></i></div></div>
@@ -1361,8 +1361,10 @@ button[aria-pressed=true]:not(.theme-toggle) { border-color:var(--cb-red);backgr
     </aside>
 
       </section>
+      <div class="calculator-sidebar">
       <section class="review-inputs" aria-labelledby="reviewInputsTitle"><h2 id="reviewInputsTitle">Your inputs</h2><p>Your current setup, used for the estimate.</p><dl><div><dt>Current annual cost</dt><dd id="reviewAnnual"></dd></div><div><dt>Selected workload</dt><dd id="reviewPatterns"></dd></div><div><dt>Cost basis</dt><dd id="reviewBasis"></dd></div></dl><div class="review-actions"><button type="button" class="back-action" data-go-step="1">Edit spend</button><button type="button" class="back-action" data-go-step="2">Edit workload</button></div></section>
       <section class="inline-methodology" aria-labelledby="inlineMethodTitle"><h2 id="inlineMethodTitle">Methodology &amp; assumptions</h2><details><summary>How savings are calculated</summary><p>Caching reduces repeat model calls. Memory, retrieval, and tool search reduce input tokens. Reductions are combined rather than added.</p></details><details><summary>What the estimate includes</summary><p>Model costs only. Couchbase, implementation, and any existing GPU commitments must be considered separately.</p></details><details><summary>Where the assumptions come from</summary><p>Defaults draw on published research and product benchmarks. Replace them with measurements from your own workload when available.</p><a href="methodology.html" target="_blank" rel="noopener">View all methodology and sources</a></details></section>
+      </div>
     </main>
   </div>
 
