@@ -532,8 +532,8 @@ body { isolation:isolate; }
 :root .ambient-scene { display:block;z-index:-1;opacity:.7; }
 :root[data-theme=dark] .ambient-scene { opacity:.9; }
 .ambient-scene .ambient-orbit { display:none; }
-.ambient-scene::before { content:'';position:absolute;right:-10vw;top:36vh;width:90vw;height:50vh;background:url('sidebar-streak.svg') center / 100% 100% no-repeat;animation:accent-drift 32s ease-in-out infinite alternate; }
-@keyframes accent-drift { from { transform:translate(-5vw,8vh) rotate(-8deg); } to { transform:translate(5vw,-10vh) rotate(5deg); } }
+.ambient-scene::before { content:'';position:absolute;right:-10vw;top:36vh;width:90vw;height:50vh;background:url('sidebar-streak.svg') center / 100% 100% no-repeat;animation:accent-drift 48s cubic-bezier(.45,0,.55,1) infinite alternate;will-change:transform; }
+@keyframes accent-drift { from { transform:translate3d(-24px,24px,0) rotate(-2deg); } to { transform:translate3d(24px,-24px,0) rotate(2deg); } }
 #calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar::after { display:none; }
 :root:is([data-theme=dark],:not([data-theme=dark])) .custom-art svg { transform:scale(1.18); }
 @media(min-width:761px) {
@@ -546,7 +546,7 @@ body { isolation:isolate; }
 }
 @media(prefers-reduced-motion:reduce) { .ambient-scene::before { animation:none; } }
 
-/* Secondary decorative accent: periwinkle, separate from red actions and green selection. */
+/* Secondary decorative accent, separate from red actions and green selection. */
 :root { --decorative-accent:#547d91; }
 :root[data-theme=dark] { --decorative-accent:#789aaa; }
 :root .ambient-scene { opacity:.85; }
@@ -571,3 +571,15 @@ body { isolation:isolate; }
 #calculator:not(:has(#step3:not([hidden]))) .calculator-sidebar::after { display:none; }
 :root .ambient-scene { opacity:.32; }
 :root[data-theme=dark] .ambient-scene { opacity:.3; }
+
+/* Stable mobile dimensions avoid jumps when browser chrome expands or collapses. */
+.ambient-scene::before { top:36svh;height:50svh; }
+@media(max-width:760px) {
+ .ambient-scene::before { width:120vw;right:-45vw;height:42svh;top:44svh;animation-name:accent-drift-mobile;animation-duration:56s; }
+}
+@keyframes accent-drift-mobile {
+ from { transform:translate3d(-8px,12px,0) rotate(-1deg); }
+ to { transform:translate3d(8px,-12px,0) rotate(1deg); }
+}
+.page-hidden .ambient-scene::before { animation-play-state:paused; }
+@media(prefers-reduced-motion:reduce) { .ambient-scene::before { animation:none;will-change:auto;transform:none; } }
